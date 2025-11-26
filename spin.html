@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Classroom Spin Wheel</title>
+<title>Classroom Spin Wheel – Rounded Fans</title>
 <style>
     body {
         margin: 0;
         font-family: Arial, Helvetica, sans-serif;
-        background: linear-gradient(135deg, #1f2a44, #3b537a);
+        background: radial-gradient(circle at top, #395ba7, #111827);
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -18,12 +18,13 @@
 
     h1 {
         margin-bottom: 10px;
+        letter-spacing: 1px;
     }
 
     #wheel-container {
         position: relative;
-        width: 400px;
-        height: 400px;
+        width: 420px;
+        height: 420px;
         margin-bottom: 20px;
     }
 
@@ -31,9 +32,12 @@
         width: 100%;
         height: 100%;
         border-radius: 50%;
-        border: 10px solid white;
+        border: 12px solid #f9fafb;
+        box-shadow: 0 15px 30px rgba(0,0,0,0.6);
         transition: transform 4.8s cubic-bezier(0.2, 0.8, 0.3, 1);
-        box-shadow: 0 0 30px rgba(255,255,255,0.4);
+        overflow: hidden;
+        background: radial-gradient(circle at center, #0f172a 0%, #020617 55%, #020617 100%);
+        position: relative;
     }
 
     .segment {
@@ -47,48 +51,63 @@
         justify-content: center;
         color: white;
         font-weight: bold;
-        font-size: 15px;
+        font-size: 14px;
         text-align: center;
-        padding: 4px;
+        padding: 6px;
         text-shadow: 1px 1px 3px black;
+        border-radius: 100% 0 0 30%;
+        box-shadow: inset 0 0 12px rgba(0,0,0,0.4);
     }
 
+    .segment span {
+        display: block;
+        transform: rotate(-30deg); /* compensate for the segment angle a bit */
+    }
+
+    /* Pointer */
     #pointer {
         width: 0;
         height: 0;
         border-left: 22px solid transparent;
         border-right: 22px solid transparent;
-        border-bottom: 40px solid yellow;
+        border-bottom: 40px solid #facc15;
         position: absolute;
-        top: -8px;
+        top: -4px;
         left: 50%;
         transform: translateX(-50%);
-        filter: drop-shadow(0 0 5px black);
+        filter: drop-shadow(0 0 6px rgba(0,0,0,0.7));
     }
 
+    /* Button + result */
     #spin-btn {
         padding: 12px 24px;
         font-size: 18px;
         border: none;
-        border-radius: 8px;
-        background: gold;
-        color: #222;
+        border-radius: 999px;
+        background: linear-gradient(135deg, #facc15, #f97316);
+        color: #111827;
         font-weight: bold;
         cursor: pointer;
         transition: 0.2s;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+        box-shadow: 0 5px 14px rgba(0,0,0,0.5);
+        margin-top: 6px;
     }
 
     #spin-btn:hover {
-        background: #ffe066;
-        transform: scale(1.07);
+        transform: scale(1.07) translateY(-1px);
+        box-shadow: 0 7px 18px rgba(0,0,0,0.6);
+    }
+
+    #spin-btn:active {
+        transform: scale(0.98) translateY(1px);
+        box-shadow: 0 3px 8px rgba(0,0,0,0.5);
     }
 
     #result-box {
-        margin-top: 20px;
-        background: rgba(255,255,255,0.15);
+        margin-top: 16px;
+        background: rgba(15,23,42,0.8);
         padding: 12px 20px;
-        border-radius: 10px;
+        border-radius: 12px;
         font-size: 20px;
         text-align: center;
         min-height: 40px;
@@ -96,6 +115,7 @@
         align-items: center;
         justify-content: center;
         width: 70%;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.4);
     }
 </style>
 </head>
@@ -105,28 +125,27 @@
 
 <div id="wheel-container">
     <div id="pointer"></div>
+
     <div id="wheel">
-
-        <!-- 6-wheel segments -->
-        <div class="segment" style="transform: rotate(0deg); background:#27ae60;">
-            Double Greencard
+        <!-- 6 segments, 60° apart -->
+        <div class="segment" style="transform: rotate(0deg); background:#16a34a;">
+            <span>Double Greencard</span>
         </div>
-        <div class="segment" style="transform: rotate(60deg); background:#2ecc71;">
-            One Greencard
+        <div class="segment" style="transform: rotate(60deg); background:#22c55e;">
+            <span>One Greencard</span>
         </div>
-        <div class="segment" style="transform: rotate(120deg); background:#e74c3c;">
-            Double Five Mark
+        <div class="segment" style="transform: rotate(120deg); background:#ef4444;">
+            <span>Double Five Mark</span>
         </div>
-        <div class="segment" style="transform: rotate(180deg); background:#ff6f61;">
-            One Five Mark
+        <div class="segment" style="transform: rotate(180deg); background:#fb7185;">
+            <span>One Five Mark</span>
         </div>
-        <div class="segment" style="transform: rotate(240deg); background:#f1c40f;">
-            Plus 5 Attitude
+        <div class="segment" style="transform: rotate(240deg); background:#eab308;">
+            <span>Plus 5 Attitude</span>
         </div>
-        <div class="segment" style="transform: rotate(300deg); background:#7f8fa6;">
-            Boom! No Point!
+        <div class="segment" style="transform: rotate(300deg); background:#6b7280;">
+            <span>Boom! No Point!</span>
         </div>
-
     </div>
 </div>
 
@@ -136,17 +155,24 @@
 <script>
     const wheel = document.getElementById("wheel");
     const resultBox = document.getElementById("result-box");
+    const spinBtn = document.getElementById("spin-btn");
 
     const items = [
         "Double Greencard",     // rare
         "One Greencard",        // easy
         "Double Five Mark",     // rare
         "One Five Mark",        // easy
-        "Plus 5 Attitude",      // VERY easy
+        "Plus 5 Attitude",      // easy (updated)
         "Boom! No Point!"       // very rare
     ];
 
-    // Weighted probabilities
+    // Weighted probabilities:
+    // - Double Greencard: rare (2)
+    // - One Greencard: easy (5)
+    // - Double Five Mark: rare (2)
+    // - One Five Mark: easy (4)
+    // - Plus 5 Attitude: easy (4)  <-- updated to be like One Five Mark
+    // - Boom! No Point!: very rare (1)
     const weightedOptions = [
         "Double Greencard",
         "Double Greencard",
@@ -169,27 +195,25 @@
         "Plus 5 Attitude",
         "Plus 5 Attitude",
         "Plus 5 Attitude",
-        "Plus 5 Attitude",
-        "Plus 5 Attitude",
 
         "Boom! No Point!"
     ];
 
-    document.getElementById("spin-btn").addEventListener("click", () => {
-
+    spinBtn.addEventListener("click", () => {
         resultBox.textContent = "";
+        spinBtn.disabled = true;
 
-        // Spin animation
-        let randomSpin = Math.floor(3600 + Math.random() * 360);
+        // Spin animation (visual only)
+        const randomSpin = Math.floor(3600 + Math.random() * 360);
         wheel.style.transform = `rotate(${randomSpin}deg)`;
 
+        // Decide outcome using weighted probabilities
         const selectedItem = weightedOptions[Math.floor(Math.random() * weightedOptions.length)];
-        const index = items.indexOf(selectedItem);
 
         setTimeout(() => {
             resultBox.textContent = "Result: " + selectedItem;
+            spinBtn.disabled = false;
         }, 5000);
-
     });
 </script>
 
