@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Cinema Quiz – Reveal Answers</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #202733;
+      color: #f5f5f5;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .quiz-wrapper {
+      max-width: 900px;
+      width: 100%;
+      background: #2f3b4d;
+      padding: 20px 24px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
+
+    h1 {
+      text-align: center;
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+
+    .note {
+      text-align: center;
+      font-size: 0.9rem;
+      margin-bottom: 16px;
+      opacity: 0.8;
+    }
+
+    .question-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .q-text {
+      flex: 1;
+      font-size: 0.95rem;
+    }
+
+    button.reveal-btn {
+      flex-shrink: 0;
+      padding: 4px 10px;
+      font-size: 0.85rem;
+      border-radius: 999px;
+      border: none;
+      background: #ffcc33;
+      color: #222;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.2s;
+    }
+
+    button.reveal-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 3px 8px rgba(0,0,0,0.4);
+    }
+
+    .answer {
+      flex-shrink: 0;
+      font-size: 0.9rem;
+      opacity: 0;
+      transform: translateY(2px);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      min-width: 120px;
+      text-align: right;
+    }
+
+    .answer.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .answer span {
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #4ade80;
+      color: #064e3b;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+<div class="quiz-wrapper">
+  <h1>The History of the Cinema – Quiz</h1>
+  <div class="note">Click “Show answer” to reveal the correct option.</div>
+
+  <!-- Questions (one per line) -->
+  <div class="question-row" data-answer="a" data-answer-text="Yes">
+    <div class="q-text">1. Were the earliest films short and silent? (a) Yes (b) No</div>
+    <button class="reveal-btn">Show answer</button>
+    <div class="answer">Answer: <span></span></div>
+  </div>
+
+  <div class="question-row" data-answer="b" data-answer-text="No">
+    <div class="q-text">2. Did the earliest films include colour? (a) Yes (b) No</div>
+    <button class="reveal-btn">Show answer</button>
+    <div class="answer">Answer: <span></span></div>
+  </div>
+
+  <div class="question-row" data-answer="b" data-answer-text="No">
+    <div class="q-text">3. Were early films usually shown at cinemas? (a) Yes (b) No</div>
+    <button class="reveal-btn">Show answer</button>
+    <div class="answer">Answer: <span></span></div>
+  </div>
+
+  <div class="question-row" data-answer="b" data-answer-text="The Lumière brothers">
+    <div class="q-text">4. Who presented the first moving pictures to a paying audience? (a) Charlie Chaplin (b) The Lumière brothers (c) The Warner brothers</div>
+    <button class="reveal-btn">Show answer</button>
+    <div class="answer">Answer: <span></span></div>
+  </div>
+
+  <div class="question-row" data-answer="c" data-answer-text="Paris">
+    <div class="q-text">5. In which city were the first moving pictures shown? (a) London (b) New York (c) Paris</div>
+    <button class="reveal-btn">Show answer</button>
+    <div class="answer">Answer: <span></span></div>
+  </div>
+
+  <div class="question-row" data-answer="a" data-answer-text="Cinematograph">
+    <div class="q-text">6. What was the name of the device the Lumière brothers used? (a) Cinematograph (b) Photographoscope (c) Videograph</div>
+    <button class="reveal-btn">Show answer</button>
+    <div class="answer">Answer: <span></span></div>
+  </div>
+
+  <div class="question-row" data-answer="a" data-answer-text="55 seconds">
+    <div class="q-text">7. How long did “The Arrival of a Train at La Ciotat” last? (a) 55 seconds (b) 5 minutes (c) 20 minutes</div>
+    <button class="reveal-btn">Show answer</button>
+    <div class="answer">Answer: <span></span></div>
+  </div>
+
+  <div class="question-row" data-answer="b" data-answer-text="1914">
+    <div class="q-text">8. By what year had several national film industries been established? (a) 1900 (b) 1914 (c) 1920</div>
+    <button class="reveal-btn">Show answer</button>
+    <div class="answer">Answer: <span></span></div>
+  </div>
+
+  <div class="question-row" data-answer="a" data-answer-text="Yes">
+    <div class="q-text">9. Did films become longer and include storytelling by 1914? (a) Yes (b) No</div>
+    <button class="reveal-btn">Show answer</button>
+    <div class="answer">Answer: <span></span></div>
+  </div>
+
+  <div class="question-row" data-answer="b" data-answer-text="Charlie Chaplin">
+    <div class="q-text">10. Who created the Tramp character? (a) Buster Keaton (b) Charlie Chaplin (c) Orson Welles</div>
+    <button class="reveal-btn">Show answer</button>
+    <div class="answer">Answer: <span></span></div>
+  </div>
+
+  <div class="question-row" data-answer="a" data-answer-text="Yes">
+    <div class="q-text">11. Did the Tramp character move like a penguin? (a) Yes (b) No</div>
+    <button class="reveal-btn">Show answer</button>
+    <div class="answer">Answer: <span></span></div>
+  </div>
+
+  <div class="question-row" data-answer="a" data-answer-text="Yes">
+    <div class="q-text">12. Were Chaplin’s films mostly made during the Silent Era? (a) Yes (b) No</div>
+    <button class="reveal-btn">Show answer</button>
+    <div class="answer">Answer: <span></span></div>
+  </div>
+
+  <div class="question-row" data-answer="a" data-answer-text="Yes">
+    <div class="q-text">13. Did Chaplin remain famous after sound movies appeared? (a) Yes (b) No</div>
+    <button class="reveal-btn">Show answer</button>
+    <div class="answer">Answer: <span></span></div>
+  </div>
+
+  <div class="question-row" data-answer="a" data-answer-text="Late 1920s">
+    <div class="q-text">14. When did films start to use sound? (a) Late 1920s (b) 1950s (c) 1970s</div>
+    <button class="reveal-btn">Show answer</button>
+    <div class="answer">Answer: <span></span></div>
+  </div>
+
+  <div class="question-row" data-answer="a" data-answer-text="Yes">
+    <div class="q-text">15. Were black-and-white films still common after colour films appeared? (a) Yes (b) No</div>
+    <button class="reveal-btn">Show answer</button>
+    <div class="answer">Answer: <span></span></div>
+  </div>
+
+</div>
+
+<script>
+  document.querySelectorAll(".question-row").forEach(function(row) {
+    const btn = row.querySelector(".reveal-btn");
+    const ansDiv = row.querySelector(".answer");
+    const span = ansDiv.querySelector("span");
+    const letter = row.getAttribute("data-answer");
+    const text = row.getAttribute("data-answer-text");
+
+    btn.addEventListener("click", function() {
+      span.textContent = letter + " – " + text;
+      ansDiv.classList.add("visible");
+      btn.disabled = true;
+      btn.textContent = "Shown";
+    });
+  });
+</script>
+
+</body>
+</html>
