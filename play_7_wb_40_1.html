@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Movie Club – Fill in the Blanks</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f4f7fa;
+        padding: 20px;
+    }
+    h1 {
+        text-align: center;
+        color: #333;
+    }
+    .question-box {
+        background: #ffffff;
+        padding: 18px;
+        margin: 15px 0;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .question-text {
+        font-size: 18px;
+        margin-bottom: 8px;
+    }
+    .blank {
+        font-style: italic;
+        color: #0073e6;
+    }
+    .answer {
+        display: none;
+        padding: 10px;
+        background: #e7f2ff;
+        border-left: 4px solid #1a73e8;
+        margin-top: 10px;
+        border-radius: 6px;
+        font-weight: bold;
+    }
+    button {
+        padding: 8px 12px;
+        border: none;
+        background: #1a73e8;
+        color: white;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+    button:hover {
+        background: #125ab5;
+    }
+</style>
+
+<script>
+function toggleAnswer(id) {
+    const ans = document.getElementById(id);
+    ans.style.display = ans.style.display === "none" ? "block" : "none";
+}
+</script>
+
+</head>
+<body>
+
+<h1>Movie Club – Fill in the Blanks</h1>
+
+<div class="question-box">
+    <div class="question-text">
+        1. They watch <span class="blank">horror</span> movies on Monday mornings.
+    </div>
+    <button onclick="toggleAnswer('q1')">Show/Hide Answer</button>
+    <div class="answer" id="q1">horror</div>
+</div>
+
+<div class="question-box">
+    <div class="question-text">
+        2. They watch <span class="blank">adventure</span> movies on Monday afternoons.
+    </div>
+    <button onclick="toggleAnswer('q2')">Show/Hide Answer</button>
+    <div class="answer" id="q2">adventure</div>
+</div>
+
+<div class="question-box">
+    <div class="question-text">
+        3. They have a <span class="blank">coffee break</span> at 4 pm on Mondays.
+    </div>
+    <button onclick="toggleAnswer('q3')">Show/Hide Answer</button>
+    <div class="answer" id="q3">coffee break</div>
+</div>
+
+<div class="question-box">
+    <div class="question-text">
+        4. They watch <span class="blank">comedy</span> movies on Tuesdays.
+    </div>
+    <button onclick="toggleAnswer('q4')">Show/Hide Answer</button>
+    <div class="answer" id="q4">comedy</div>
+</div>
+
+<div class="question-box">
+    <div class="question-text">
+        5. They like <span class="blank">talking</span> about the movies at dinner on Tuesdays.
+    </div>
+    <button onclick="toggleAnswer('q5')">Show/Hide Answer</button>
+    <div class="answer" id="q5">talking</div>
+</div>
+
+</body>
+</html>
