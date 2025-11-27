@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Prepositions of Time: In / On / At – Practice</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f5f5f5;
+        padding: 20px;
+        line-height: 1.6;
+    }
+    h1 {
+        text-align: center;
+        color: #333;
+    }
+    .question-box {
+        background: white;
+        padding: 18px;
+        margin: 15px 0;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+    .question-text {
+        font-size: 18px;
+        margin-bottom: 8px;
+    }
+    .answer {
+        display: none;
+        padding: 10px;
+        background: #e8f4ff;
+        border-left: 4px solid #1a73e8;
+        margin-top: 10px;
+        border-radius: 6px;
+        font-weight: bold;
+    }
+    button {
+        padding: 8px 12px;
+        border: none;
+        background: #1a73e8;
+        color: white;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+    button:hover {
+        background: #125ab5;
+    }
+</style>
+
+<script>
+function toggleAnswer(id) {
+    const ans = document.getElementById(id);
+    if (ans.style.display === "none") {
+        ans.style.display = "block";
+    } else {
+        ans.style.display = "none";
+    }
+}
+</script>
+
+</head>
+<body>
+
+<h1>Prepositions of Time: In / On / At</h1>
+
+<div class="question-box">
+    <div class="question-text">1. We watch different types of movies ___ different days.</div>
+    <button onclick="toggleAnswer('a1')">Show/Hide Answer</button>
+    <div class="answer" id="a1">on</div>
+</div>
+
+<div class="question-box">
+    <div class="question-text">2. Come to our club ___ Mondays.</div>
+    <button onclick="toggleAnswer('a2')">Show/Hide Answer</button>
+    <div class="answer" id="a2">on</div>
+</div>
+
+<div class="question-box">
+    <div class="question-text">3. ___ Mondays, we watch only horror and adventure movies.</div>
+    <button onclick="toggleAnswer('a3')">Show/Hide Answer</button>
+    <div class="answer" id="a3">On</div>
+</div>
+
+<div class="question-box">
+    <div class="question-text">4. ___ the morning, we watch two horror movies.</div>
+    <button onclick="toggleAnswer('a4')">Show/Hide Answer</button>
+    <div class="answer" id="a4">In</div>
+</div>
+
+<div class="question-box">
+    <div class="question-text">5. We enjoy meeting our club members ___ lunch.</div>
+    <button onclick="toggleAnswer('a5')">Show/Hide Answer</button>
+    <div class="answer" id="a5">at</div>
+</div>
+
+<div class="question-box">
+    <div class="question-text">6. ___ the afternoon, we watch an adventure movie.</div>
+    <button onclick="toggleAnswer('a6')">Show/Hide Answer</button>
+    <div class="answer" id="a6">In</div>
+</div>
+
+<div class="question-box">
+    <div class="question-text">7. After the movie, we have a coffee break ___ 4 pm.</div>
+    <button onclick="toggleAnswer('a7')">Show/Hide Answer</button>
+    <div class="answer" id="a7">at</div>
+</div>
+
+<div class="question-box">
+    <div class="question-text">8. Visit our club ___ Tuesdays, then.</div>
+    <button onclick="toggleAnswer('a8')">Show/Hide Answer</button>
+    <div class="answer" id="a8">on</div>
+</div>
+
+<div class="question-box">
+    <div class="question-text">9. ___ the evening, there is a comedy movie dinner.</div>
+    <button onclick="toggleAnswer('a9')">Show/Hide Answer</button>
+    <div class="answer" id="a9">In</div>
+</div>
+
+<div class="question-box">
+    <div class="question-text">10. It is ___ 6 pm.</div>
+    <button onclick="toggleAnswer('a10')">Show/Hide Answer</button>
+    <div class="answer" id="a10">at</div>
+</div>
+
+</body>
+</html>
