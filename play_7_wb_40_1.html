@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Movie Club – Fill in the Blanks</title>
+<title>Movie Club – Vocabulary Practice</title>
 
 <style>
     body {
@@ -26,8 +26,10 @@
         margin-bottom: 8px;
     }
     .blank {
-        font-style: italic;
-        color: #0073e6;
+        display: inline-block;
+        min-width: 120px;
+        border-bottom: 2px solid #999;
+        margin: 0 4px;
     }
     .answer {
         display: none;
@@ -55,7 +57,9 @@
 <script>
 function toggleAnswer(id) {
     const ans = document.getElementById(id);
-    ans.style.display = ans.style.display === "none" ? "block" : "none";
+    ans.style.display = (ans.style.display === "none" || ans.style.display === "") 
+                        ? "block" 
+                        : "none";
 }
 </script>
 
@@ -66,7 +70,7 @@ function toggleAnswer(id) {
 
 <div class="question-box">
     <div class="question-text">
-        1. They watch <span class="blank">horror</span> movies on Monday mornings.
+        1. They watch <span class="blank"></span> movies on Monday mornings.
     </div>
     <button onclick="toggleAnswer('q1')">Show/Hide Answer</button>
     <div class="answer" id="q1">horror</div>
@@ -74,7 +78,7 @@ function toggleAnswer(id) {
 
 <div class="question-box">
     <div class="question-text">
-        2. They watch <span class="blank">adventure</span> movies on Monday afternoons.
+        2. They watch <span class="blank"></span> movies on Monday afternoons.
     </div>
     <button onclick="toggleAnswer('q2')">Show/Hide Answer</button>
     <div class="answer" id="q2">adventure</div>
@@ -82,7 +86,7 @@ function toggleAnswer(id) {
 
 <div class="question-box">
     <div class="question-text">
-        3. They have a <span class="blank">coffee break</span> at 4 pm on Mondays.
+        3. They have a <span class="blank"></span> at 4 pm on Mondays.
     </div>
     <button onclick="toggleAnswer('q3')">Show/Hide Answer</button>
     <div class="answer" id="q3">coffee break</div>
@@ -90,7 +94,7 @@ function toggleAnswer(id) {
 
 <div class="question-box">
     <div class="question-text">
-        4. They watch <span class="blank">comedy</span> movies on Tuesdays.
+        4. They watch <span class="blank"></span> movies on Tuesdays.
     </div>
     <button onclick="toggleAnswer('q4')">Show/Hide Answer</button>
     <div class="answer" id="q4">comedy</div>
@@ -98,7 +102,7 @@ function toggleAnswer(id) {
 
 <div class="question-box">
     <div class="question-text">
-        5. They like <span class="blank">talking</span> about the movies at dinner on Tuesdays.
+        5. They like <span class="blank"></span> about the movies at dinner on Tuesdays.
     </div>
     <button onclick="toggleAnswer('q5')">Show/Hide Answer</button>
     <div class="answer" id="q5">talking</div>
