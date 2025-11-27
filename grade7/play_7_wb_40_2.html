@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Movie Club – True or False Activity</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f4f7fa;
+        padding: 20px;
+    }
+    h1 {
+        text-align: center;
+        color: #333;
+    }
+    .question-box {
+        background: #ffffff;
+        padding: 18px;
+        margin: 15px 0;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .question-text {
+        font-size: 18px;
+        width: 70%;
+    }
+    .buttons {
+        display: flex;
+        gap: 10px;
+    }
+    button {
+        padding: 8px 15px;
+        border: none;
+        border-radius: 6px;
+        font-size: 14px;
+        cursor: pointer;
+        color: white;
+    }
+    .true-btn {
+        background-color: #1a73e8;
+    }
+    .false-btn {
+        background-color: #888;
+    }
+    button:hover {
+        opacity: 0.85;
+    }
+    .answer {
+        margin-top: 10px;
+        background: #e7f2ff;
+        padding: 10px;
+        border-left: 4px solid #1a73e8;
+        border-radius: 6px;
+        display: none;
+        font-weight: bold;
+    }
+</style>
+
+<script>
+function toggleAnswer(id) {
+    const ans = document.getElementById(id);
+    ans.style.display = (ans.style.display === "none" || ans.style.display === "") 
+                        ? "block" 
+                        : "none";
+}
+</script>
+
+</head>
+<body>
+
+<h1>Movie Club – True or False</h1>
+
+<div class="question-box">
+    <div class="question-text">
+        1. On Monday morning, they watch two horror movies.
+    </div>
+    <div class="buttons">
+        <button class="true-btn" onclick="toggleAnswer('a1')">T</button>
+        <button class="false-btn" onclick="toggleAnswer('a1')">F</button>
+    </div>
+</div>
+<div class="answer" id="a1">True</div>
+
+<div class="question-box">
+    <div class="question-text">
+        2. They enjoy meeting the club members at lunch on Tuesdays.
+    </div>
+    <div class="buttons">
+        <button class="true-btn" onclick="toggleAnswer('a2')">T</button>
+        <button class="false-btn" onclick="toggleAnswer('a2')">F</button>
+    </div>
+</div>
+<div class="answer" id="a2">False</div>
+
+<div class="question-box">
+    <div class="question-text">
+        3. On Tuesday afternoon they watch an adventure movie.
+    </div>
+    <div class="buttons">
+        <button class="true-btn" onclick="toggleAnswer('a3')">T</button>
+        <button class="false-btn" onclick="toggleAnswer('a3')">F</button>
+    </div>
+</div>
+<div class="answer" id="a3">False</div>
+
+<div class="question-box">
+    <div class="question-text">
+        4. On Tuesday evening there is a comedy movie dinner.
+    </div>
+    <div class="buttons">
+        <button class="true-btn" onclick="toggleAnswer('a4')">T</button>
+        <button class="false-btn" onclick="toggleAnswer('a4')">F</button>
+    </div>
+</div>
+<div class="answer" id="a4">True</div>
+
+<div class="question-box">
+    <div class="question-text">
+        5. They have comedy movies all day long on Tuesdays.
+    </div>
+    <div class="buttons">
+        <button class="true-btn" onclick="toggleAnswer('a5')">T</button>
+        <button class="false-btn" onclick="toggleAnswer('a5')">F</button>
+    </div>
+</div>
+<div class="answer" id="a5">True</div>
+
+</body>
+</html>
