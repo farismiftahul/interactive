@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Sarah – Movie Addict Activities</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f4f7fa;
+        padding: 20px;
+    }
+    h1, h2 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 10px;
+    }
+    .question-box {
+        background: #ffffff;
+        padding: 18px;
+        margin: 15px auto;
+        border-radius: 12px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        max-width: 750px;
+    }
+    .question-text {
+        font-size: 18px;
+        margin-bottom: 8px;
+    }
+    .blank {
+        display: inline-block;
+        min-width: 150px;
+        border-bottom: 2px solid #999;
+        margin: 0 4px;
+    }
+    button {
+        padding: 8px 14px;
+        border: none;
+        background: #1a73e8;
+        color: white;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+    button:hover {
+        background: #125ab5;
+    }
+    .answer {
+        display: none;
+        padding: 10px;
+        background: #e7f2ff;
+        border-left: 4px solid #1a73e8;
+        margin-top: 10px;
+        border-radius: 6px;
+        font-weight: bold;
+    }
+</style>
+
+<script>
+function toggleAnswer(id) {
+    const ans = document.getElementById(id);
+    ans.style.display =
+        (ans.style.display === "none" || ans.style.display === "") ? "block" : "none";
+}
+</script>
+
+</head>
+
+<body>
+
+<h1>A Movie Addict</h1>
+
+<!-- PART 1 -->
+<h2>Part 1 – Sarah Usually Watches:</h2>
+
+<div class="question-box">
+    <div class="question-text">
+        1. Sarah usually watches <strong>action movies</strong>
+        <span class="blank"></span>.
+    </div>
+    <button onclick="toggleAnswer('p1q1')">Show / Hide Answer</button>
+    <div class="answer" id="p1q1">in the morning</div>
+</div>
+
+<div class="question-box">
+    <div class="question-text">
+        2. Sarah usually watches <strong>science-fiction movies</strong>
+        <span class="blank"></span>.
+    </div>
+    <button onclick="toggleAnswer('p1q2')">Show / Hide Answer</button>
+    <div class="answer" id="p1q2">in the afternoon</div>
+</div>
+
+<div class="question-box">
+    <div class="question-text">
+        3. Sarah usually watches <strong>romantic movies</strong>
+        <span class="blank"></span>.
+    </div>
+    <button onclick="toggleAnswer('p1q3')">Show / Hide Answer</button>
+    <div class="answer" id="p1q3">in the evening</div>
+</div>
+
+
+<!-- PART 2 -->
+<h2>Part 2 – Choose the Correct Word:</h2>
+
+<div class="question-box">
+    <div class="question-text">
+        1. Sarah Jones is a <span class="blank"></span> from Florida.
+    </div>
+    <button onclick="toggleAnswer('p2q1')">Show / Hide Answer</button>
+    <div class="answer" id="p2q1">banker</div>
+</div>
+
+<div class="question-box">
+    <div class="question-text">
+        2. Sarah starts watching movies at <span class="blank"></span> am in the morning.
+    </div>
+    <button onclick="toggleAnswer('p2q2')">Show / Hide Answer</button>
+    <div class="answer" id="p2q2">08:00</div>
+</div>
+
+<div class="question-box">
+    <div class="question-text">
+        3. Sarah takes a walk in the <span class="blank"></span>.
+    </div>
+    <button onclick="toggleAnswer('p2q3')">Show / Hide Answer</button>
+    <div class="answer" id="p2q3">afternoon</div>
+</div>
+
+<div class="question-box">
+    <div class="question-text">
+        4. Sarah watches <span class="blank"></span> movies at the weekends.
+    </div>
+    <button onclick="toggleAnswer('p2q4')">Show / Hide Answer</button>
+    <div class="answer" id="p2q4">seventeen</div>
+</div>
+
+<div class="question-box">
+    <div class="question-text">
+        5. Sarah's lifestyle is <span class="blank"></span> for many people.
+    </div>
+    <button onclick="toggleAnswer('p2q5')">Show / Hide Answer</button>
+    <div class="answer" id="p2q5">unusual</div>
+</div>
+
+</body>
+</html>
