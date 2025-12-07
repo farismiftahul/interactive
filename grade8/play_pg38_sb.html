@@ -3,74 +3,43 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Modals Quiz — 4 Teams Game (Kid Friendly)</title>
+  <title>Modals Quiz — 4 Teams Game (Kid Friendly) v2</title>
   <style>
-    /* Make the page white and kid-friendly. Responsive and iframe-friendly (100% sizing). */
     html,body{height:100%;margin:0;background:#ffffff}
-    :root{
-      --bg:#ffffff;
-      --card:#f7fbff;
-      --accent:#ff6f61; /* coral */
-      --accent-2:#4aa3df; /* sky */
-      --muted:#6b7280;
-      --good:#16a34a;
-      --bad:#dc2626;
-      --radius:14px;
-      --shadow: 0 8px 24px rgba(10,20,40,0.06);
-      --maxWidth:1200px;
-    }
-
-    /* Layout tuned for iframes: full width & height available, fluid columns */
+    :root{--bg:#ffffff;--card:#f7fbff;--accent:#ff6f61;--accent-2:#4aa3df;--muted:#6b7280;--good:#16a34a;--bad:#dc2626;--radius:14px;--shadow: 0 8px 24px rgba(10,20,40,0.06);--maxWidth:1200px}
     .app{box-sizing:border-box;min-height:100vh;padding:18px;display:flex;flex-direction:column;align-items:center}
     .container{width:100%;max-width:var(--maxWidth);display:grid;grid-template-columns:360px 1fr;gap:18px}
     @media (max-width:880px){ .container{grid-template-columns:1fr; padding:12px} }
-
     header{width:100%;margin-bottom:6px}
     h1{font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;font-size:20px;margin:0 0 6px;color:#0f172a}
     .lead{color:var(--muted);font-size:13px;margin:0 0 12px}
-
     .card{background:var(--card);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow);border:1px solid rgba(14,44,75,0.04)}
-
-    /* Left column (teams & controls) */
     .teams{display:grid;grid-template-columns:1fr 1fr;gap:8px}
     .team{background:#fff;border-radius:10px;padding:10px;border:1px solid rgba(12,24,40,0.06);display:flex;flex-direction:column;gap:6px;align-items:flex-start}
     .team.active{outline:4px solid rgba(74,163,223,0.18);transform:translateY(-4px)}
     .team input[type=text]{border:0;outline:none;font-weight:700;font-size:15px;background:transparent}
     .team .score{font-size:18px;color:var(--accent-2);font-weight:800}
-
     .controls{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
     button{background:white;border-radius:10px;padding:10px 12px;border:1px solid rgba(12,24,40,0.08);cursor:pointer;font-weight:700}
     .btn-primary{background:linear-gradient(90deg,var(--accent-2),#7bdcff);color:white;border:0}
     .btn-ghost{background:transparent}
     .btn-danger{background:linear-gradient(90deg,#ff7a7a,#ff5960);color:white;border:0}
-
     .info{font-size:13px;color:var(--muted);margin-top:10px}
-
-    /* Right column (game board) */
     .board{display:flex;flex-direction:column;gap:12px}
     .metaRow{display:flex;justify-content:space-between;align-items:center;gap:8px}
     .pill{background:white;padding:8px 12px;border-radius:999px;border:1px solid rgba(12,24,40,0.06);font-weight:700}
-
     .cardLarge{background:linear-gradient(180deg,#ffffff,#f7fbff);border-radius:16px;padding:18px;box-shadow:var(--shadow);min-height:220px}
     .question{font-size:18px;color:#07203a;margin:0 0 8px}
     .choices{display:grid;grid-template-columns:1fr 1fr;gap:10px}
     @media (max-width:600px){ .choices{grid-template-columns:1fr} }
-
     .choice{background:white;padding:12px;border-radius:10px;border:1px solid rgba(12,24,40,0.06);cursor:pointer;font-weight:700;text-align:center}
     .choice.correct{background:linear-gradient(90deg,#e6fbef,#d6f7e6);border-color:var(--good)}
     .choice.wrong{background:linear-gradient(90deg,#fff1f1,#feecec);border-color:var(--bad)}
     .choice.disabled{opacity:0.6;cursor:default}
-
     .explain{background:white;padding:10px;border-radius:10px;border:1px solid rgba(12,24,40,0.04);font-size:14px;color:#13324d}
-
     .progress{height:12px;background:#eef3f8;border-radius:999px;overflow:hidden}
     .progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent-2),#b2e7ff);width:0%}
-
     footer{width:100%;margin-top:10px;text-align:center;color:var(--muted);font-size:13px}
-
-    /* Make iframe-friendly: let parent control height; use 100% widths */
-    :root{scrollbar-gutter:stable}
-    *{box-sizing:border-box}
   </style>
 </head>
 <body>
@@ -81,11 +50,10 @@
     </header>
 
     <div class="container">
-      <!-- left column -->
       <div class="card">
         <div style="display:flex;gap:8px;align-items:center;justify-content:space-between">
           <div style="font-weight:800">Teams</div>
-          <div style="font-size:13px;color:var(--muted)">Click a team to make it active</div>
+          <div style="font-size:13px;color:var(--muted)">Tap a team card to make it active</div>
         </div>
 
         <div class="teams" style="margin-top:10px" id="teamsContainer">
@@ -110,7 +78,6 @@
         <div class="info">Tip: Use <strong>Correct</strong> to add points for the active team, or have teams tap a choice themselves.</div>
       </div>
 
-      <!-- right column -->
       <div>
         <div class="cardLarge card">
           <div class="metaRow">
@@ -135,11 +102,10 @@
       </div>
     </div>
 
-    <footer>Designed for classroom use — resize this page when embedding in an &lt;iframe&gt; (it is responsive).</footer>
+    <footer>Designed for classroom use — responsive and iframe-friendly.</footer>
   </div>
 
   <script>
-    // same 24 question bank
     const bank = [
       {q: 'Which modal is most appropriate to ask for formal permission?','choices':['Can I leave early?','Could I leave early?','May I leave early?','Will I leave early?'],'correct':2,'ex':'"May" is the most formal way to ask for permission.'},
       {q:'Which sentence shows asking permission politely using "could"?','choices':['Could I turn on the TV?','Could you turn on the TV?','Can I turn on the TV?','May I turn on the TV?'],'correct':0,'ex':'"Could I..." is a polite way to ask for permission for yourself.'},
@@ -166,14 +132,12 @@
       {q:'Which structure is used to ask politeness about someone else doing something?','choices':['Would you mind + Ving','Could I + V','May I + V','Can I + V'],'correct':0,'ex':'"Would you mind + Ving" makes very polite requests about someone else doing something.'}
     ];
 
-    // state
     let remainingIdx = [];
     let asked = [];
     let current = null;
-    let currentTeam = 0; // 0..3
+    let currentTeam = 0;
     let scores = [0,0,0,0];
 
-    // DOM refs
     const remainingEl = document.getElementById('remaining');
     const barEl = document.getElementById('bar');
     const questionEl = document.getElementById('question');
@@ -270,30 +234,35 @@
     function passQuestion(){ explainEl.innerHTML = `<strong>Passed.</strong> Answer: ${bank[current].choices[bank[current].correct]}.`; explainEl.style.display = 'block'; nextBtn.disabled = false; correctBtn.disabled = true; wrongBtn.disabled = true; passBtn.disabled = true; revealBtn.disabled = true; updateUsedArea(); }
     function revealAnswer(){ Array.from(choicesEl.children).forEach(ch=>{ ch.classList.add('disabled'); if (Number(ch.dataset.index) === bank[current].correct) ch.classList.add('correct'); }); explainEl.style.display = 'block'; explainEl.textContent = `Answer: ${bank[current].choices[bank[current].correct]}. ${bank[current].ex}`; nextBtn.disabled = false; correctBtn.disabled = true; wrongBtn.disabled = true; passBtn.disabled = true; revealBtn.disabled = true; updateUsedArea(); }
 
-    function nextTurn(){ currentTeam = (currentTeam + 1) % 4; updateActiveUI(); const idx = pick(); if (idx === null){ questionEl.textContent = 'All questions completed.'; choicesEl.innerHTML = ''; explainEl.style.display = 'block'; explainEl.textContent = `Game over. Final scores:
-${scores.map((s,i)=>`${getTeamName(i)}: ${s}`).join('
-')}`; nextBtn.disabled = true; correctBtn.disabled = true; wrongBtn.disabled = true; passBtn.disabled = true; revealBtn.disabled = true; updateUsedArea(); return; } renderQuestion(idx); updateUsedArea(); }
+    function nextTurn(){ currentTeam = (currentTeam + 1) % 4; updateActiveUI(); const idx = pick(); if (idx === null){ questionEl.textContent = 'All questions completed.'; choicesEl.innerHTML = ''; explainEl.style.display = 'block'; explainEl.textContent = `Game over. Final scores:\n${scores.map((s,i)=>`${getTeamName(i)}: ${s}`).join('\n')}`; nextBtn.disabled = true; correctBtn.disabled = true; wrongBtn.disabled = true; passBtn.disabled = true; revealBtn.disabled = true; updateUsedArea(); return; } renderQuestion(idx); updateUsedArea(); }
 
     function updateScoresUI(){ for(let i=0;i<4;i++) document.getElementById('s'+i).textContent = scores[i]; }
     function getTeamName(i){ const input = document.getElementById('t'+i); return input ? (input.value || `Team ${i+1}`) : `Team ${i+1}`; }
     function updateActiveUI(){ Array.from(teamsContainer.children).forEach(ch=>{ const idx = Number(ch.dataset.index); if (idx === currentTeam) ch.classList.add('active'); else ch.classList.remove('active'); }); activeName.textContent = getTeamName(currentTeam); }
-    function updateUsedArea(){ if (asked.length === 0) { document.getElementById('usedArea').textContent = 'Asked questions will appear here.'; return; } const list = asked.map((i,idx)=>`${idx+1}. ${bank[i].q}`).join('
-'); document.getElementById('usedArea').innerHTML = '<pre style="margin:0">'+escapeHtml(list)+'</pre>'; }
+    function updateUsedArea(){ if (asked.length === 0) { document.getElementById('usedArea').textContent = 'Asked questions will appear here.'; return; } const list = asked.map((i,idx)=>`${idx+1}. ${bank[i].q}`).join('\n'); document.getElementById('usedArea').innerHTML = '<pre style="margin:0">'+escapeHtml(list)+'</pre>'; }
     function escapeHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
+    // improved team click behavior: clicking the card (non-input areas) sets active team; clicking input focuses editing
+    function attachTeamClickHandlers(){ Array.from(teamsContainer.children).forEach(ch=>{
+      ch.style.cursor = 'pointer';
+      ch.addEventListener('click', (ev)=>{
+        const tag = ev.target && ev.target.tagName ? ev.target.tagName.toLowerCase() : '';
+        if (tag === 'input' || tag === 'textarea') return; // allow editing without switching
+        currentTeam = Number(ch.dataset.index);
+        updateActiveUI();
+      });
+      const childInput = ch.querySelector('input');
+      if (childInput) childInput.addEventListener('click', (e)=>e.stopPropagation());
+    }); }
+
     // button wiring
-    startBtn.addEventListener('click', ()=>{ init(); // copy top team-name inputs (if present)
-      for(let i=0;i<4;i++){ const top = document.getElementById('team'+i+'Name'); const inpt = document.getElementById('t'+i); if (top && inpt) inpt.value = top.value || inpt.value; }
-      const idx = pick(); if (idx!==null) renderQuestion(idx); updateUsedArea(); });
+    startBtn.addEventListener('click', ()=>{ init(); attachTeamClickHandlers(); const idx = pick(); if (idx!==null) renderQuestion(idx); updateUsedArea(); });
     nextBtn.addEventListener('click', ()=>{ nextTurn(); });
     correctBtn.addEventListener('click', ()=>{ awardCorrect(); });
     wrongBtn.addEventListener('click', ()=>{ markWrong(); });
     passBtn.addEventListener('click', ()=>{ passQuestion(); });
     revealBtn.addEventListener('click', ()=>{ revealAnswer(); });
     resetBtn.addEventListener('click', ()=>{ init(); });
-
-    // allow clicking team to set active
-    Array.from(teamsContainer.children).forEach(ch=>{ ch.addEventListener('click', ()=>{ currentTeam = Number(ch.dataset.index); updateActiveUI(); }); });
 
     // init on load
     init();
