@@ -3,85 +3,143 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Modals Quiz — 4 Teams Game</title>
+  <title>Modals Quiz — 4 Teams Game (Kid Friendly)</title>
   <style>
-    :root{--accent:#0b66a3;--correct:#0a662a;--wrong:#a10b0b}
-    body{font-family:Arial,Helvetica,sans-serif;max-width:1100px;margin:20px auto;padding:18px;color:#222}
-    h1{font-size:20px;margin:6px 0 12px}
-    .layout{display:grid;grid-template-columns:320px 1fr;gap:18px}
-    .card{border:1px solid #ddd;padding:14px;border-radius:8px;background:#fbfbfc}
+    /* Make the page white and kid-friendly. Responsive and iframe-friendly (100% sizing). */
+    html,body{height:100%;margin:0;background:#ffffff}
+    :root{
+      --bg:#ffffff;
+      --card:#f7fbff;
+      --accent:#ff6f61; /* coral */
+      --accent-2:#4aa3df; /* sky */
+      --muted:#6b7280;
+      --good:#16a34a;
+      --bad:#dc2626;
+      --radius:14px;
+      --shadow: 0 8px 24px rgba(10,20,40,0.06);
+      --maxWidth:1200px;
+    }
+
+    /* Layout tuned for iframes: full width & height available, fluid columns */
+    .app{box-sizing:border-box;min-height:100vh;padding:18px;display:flex;flex-direction:column;align-items:center}
+    .container{width:100%;max-width:var(--maxWidth);display:grid;grid-template-columns:360px 1fr;gap:18px}
+    @media (max-width:880px){ .container{grid-template-columns:1fr; padding:12px} }
+
+    header{width:100%;margin-bottom:6px}
+    h1{font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;font-size:20px;margin:0 0 6px;color:#0f172a}
+    .lead{color:var(--muted);font-size:13px;margin:0 0 12px}
+
+    .card{background:var(--card);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow);border:1px solid rgba(14,44,75,0.04)}
+
+    /* Left column (teams & controls) */
     .teams{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-    .team{padding:8px;border-radius:6px;background:#fff;border:1px solid #ccc}
-    .team.active{box-shadow:0 0 0 3px rgba(11,102,163,0.12);border-color:var(--accent)}
-    .team input{width:100%;font-weight:700;border:0;background:transparent}
-    .score{font-size:18px;font-weight:700;color:var(--correct)}
-    .controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-    .question{font-size:18px;margin:8px 0}
-    .choices{display:flex;flex-direction:column;gap:8px}
-    .choice{padding:10px;border-radius:6px;border:1px solid #ccc;background:#fff;cursor:pointer}
-    .choice.disabled{opacity:0.6;cursor:not-allowed}
-    .choice.correct{border-color:var(--correct);background:#e6f6ea}
-    .choice.wrong{border-color:var(--wrong);background:#fdecea}
-    button{padding:8px 12px;border-radius:6px;border:1px solid #888;background:#fff;cursor:pointer}
-    button:disabled{opacity:0.5;cursor:not-allowed}
-    .small{font-size:13px;color:#666}
-    .progress{height:10px;background:#eee;border-radius:6px;overflow:hidden;margin-top:10px}
-    .progress > i{display:block;height:100%;background:linear-gradient(90deg,#cfe8ff,#a6d0ff);width:0%}
-    .explain{margin-top:10px;padding:10px;border-radius:6px;background:#fff;border:1px solid #eee}
-    .settings{display:flex;gap:8px;align-items:center;margin-bottom:8px}
-    pre{white-space:pre-wrap}
+    .team{background:#fff;border-radius:10px;padding:10px;border:1px solid rgba(12,24,40,0.06);display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+    .team.active{outline:4px solid rgba(74,163,223,0.18);transform:translateY(-4px)}
+    .team input[type=text]{border:0;outline:none;font-weight:700;font-size:15px;background:transparent}
+    .team .score{font-size:18px;color:var(--accent-2);font-weight:800}
+
+    .controls{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+    button{background:white;border-radius:10px;padding:10px 12px;border:1px solid rgba(12,24,40,0.08);cursor:pointer;font-weight:700}
+    .btn-primary{background:linear-gradient(90deg,var(--accent-2),#7bdcff);color:white;border:0}
+    .btn-ghost{background:transparent}
+    .btn-danger{background:linear-gradient(90deg,#ff7a7a,#ff5960);color:white;border:0}
+
+    .info{font-size:13px;color:var(--muted);margin-top:10px}
+
+    /* Right column (game board) */
+    .board{display:flex;flex-direction:column;gap:12px}
+    .metaRow{display:flex;justify-content:space-between;align-items:center;gap:8px}
+    .pill{background:white;padding:8px 12px;border-radius:999px;border:1px solid rgba(12,24,40,0.06);font-weight:700}
+
+    .cardLarge{background:linear-gradient(180deg,#ffffff,#f7fbff);border-radius:16px;padding:18px;box-shadow:var(--shadow);min-height:220px}
+    .question{font-size:18px;color:#07203a;margin:0 0 8px}
+    .choices{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    @media (max-width:600px){ .choices{grid-template-columns:1fr} }
+
+    .choice{background:white;padding:12px;border-radius:10px;border:1px solid rgba(12,24,40,0.06);cursor:pointer;font-weight:700;text-align:center}
+    .choice.correct{background:linear-gradient(90deg,#e6fbef,#d6f7e6);border-color:var(--good)}
+    .choice.wrong{background:linear-gradient(90deg,#fff1f1,#feecec);border-color:var(--bad)}
+    .choice.disabled{opacity:0.6;cursor:default}
+
+    .explain{background:white;padding:10px;border-radius:10px;border:1px solid rgba(12,24,40,0.04);font-size:14px;color:#13324d}
+
+    .progress{height:12px;background:#eef3f8;border-radius:999px;overflow:hidden}
+    .progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent-2),#b2e7ff);width:0%}
+
+    footer{width:100%;margin-top:10px;text-align:center;color:var(--muted);font-size:13px}
+
+    /* Make iframe-friendly: let parent control height; use 100% widths */
+    :root{scrollbar-gutter:stable}
+    *{box-sizing:border-box}
   </style>
 </head>
 <body>
-  <h1>Modals of Permission & Request — 4 Teams Game</h1>
-  <div class="layout">
+  <div class="app">
+    <header>
+      <h1>Modals of Permission & Request — Team Quiz</h1>
+      <div class="lead">Turn-based classroom game for four teams. Use big buttons and colorful cards for younger learners.</div>
+    </header>
 
-    <div class="card">
-      <div class="settings">
-        <label class="small">Team names:</label>
-        <input id="team0Name" value="Team A" />
-        <input id="team1Name" value="Team B" />
-        <input id="team2Name" value="Team C" />
-        <input id="team3Name" value="Team D" />
+    <div class="container">
+      <!-- left column -->
+      <div class="card">
+        <div style="display:flex;gap:8px;align-items:center;justify-content:space-between">
+          <div style="font-weight:800">Teams</div>
+          <div style="font-size:13px;color:var(--muted)">Click a team to make it active</div>
+        </div>
+
+        <div class="teams" style="margin-top:10px" id="teamsContainer">
+          <div class="team" data-index="0"><input id="t0" type="text" value="Team A" maxlength="18" /><div class="score" id="s0">0</div></div>
+          <div class="team" data-index="1"><input id="t1" type="text" value="Team B" maxlength="18" /><div class="score" id="s1">0</div></div>
+          <div class="team" data-index="2"><input id="t2" type="text" value="Team C" maxlength="18" /><div class="score" id="s2">0</div></div>
+          <div class="team" data-index="3"><input id="t3" type="text" value="Team D" maxlength="18" /><div class="score" id="s3">0</div></div>
+        </div>
+
+        <div style="margin-top:12px;font-weight:700">Active team: <span id="activeName">Team A</span></div>
+
+        <div class="controls">
+          <button id="startBtn" class="btn-primary">Start Game</button>
+          <button id="nextBtn">Next (rotate)</button>
+          <button id="correctBtn" class="btn-primary">Correct (+10)</button>
+          <button id="wrongBtn" class="btn-danger">Incorrect</button>
+          <button id="passBtn">Pass</button>
+          <button id="revealBtn">Reveal</button>
+          <button id="resetBtn" class="btn-ghost">Reset</button>
+        </div>
+
+        <div class="info">Tip: Use <strong>Correct</strong> to add points for the active team, or have teams tap a choice themselves.</div>
       </div>
 
-      <div class="teams" id="teamsContainer">
-        <div class="team" data-index="0"><div><input id="t0" value="Team A" /></div><div class="small">Score: <span id="s0" class="score">0</span></div></div>
-        <div class="team" data-index="1"><div><input id="t1" value="Team B" /></div><div class="small">Score: <span id="s1" class="score">0</span></div></div>
-        <div class="team" data-index="2"><div><input id="t2" value="Team C" /></div><div class="small">Score: <span id="s2" class="score">0</span></div></div>
-        <div class="team" data-index="3"><div><input id="t3" value="Team D" /></div><div class="small">Score: <span id="s3" class="score">0</span></div></div>
-      </div>
+      <!-- right column -->
+      <div>
+        <div class="cardLarge card">
+          <div class="metaRow">
+            <div class="pill">Questions left: <strong id="remaining">24</strong></div>
+            <div style="display:flex;gap:8px;align-items:center"><div class="pill">Scoreboard</div></div>
+          </div>
 
-      <div style="margin-top:10px" class="small">Active team: <strong id="activeName">Team A</strong></div>
-      <div class="controls">
-        <button id="startBtn">Start Game</button>
-        <button id="nextBtn" disabled>Next Question (rotate)</button>
-        <button id="correctBtn" disabled>Correct (+10)</button>
-        <button id="wrongBtn" disabled>Incorrect</button>
-        <button id="passBtn" disabled>Pass</button>
-        <button id="revealBtn" disabled>Reveal Answer</button>
-        <button id="resetBtn">Reset Game</button>
-      </div>
+          <div style="margin-top:12px">
+            <div class="question" id="question">Click Start Game to begin.</div>
 
-      <div class="small" style="margin-top:8px">Use the inputs above to change team names. Click <em>Correct</em> to add points to the active team, or <em>Incorrect</em> if they miss. <strong>Next Question</strong> rotates to the next team.</div>
+            <div class="choices" id="choices"></div>
+
+            <div style="margin-top:12px" class="progress"><i id="bar"></i></div>
+
+            <div class="explain" id="explain" style="display:none"></div>
+          </div>
+        </div>
+
+        <div style="margin-top:12px" class="card">
+          <div id="usedArea" class="small">Asked questions will appear here.</div>
+        </div>
+      </div>
     </div>
 
-    <div class="card">
-      <div class="small">Questions remaining: <span id="remaining">24</span></div>
-      <div class="progress"><i id="bar"></i></div>
-
-      <div class="question" id="question">Click Start Game to begin.</div>
-
-      <div class="choices" id="choices"></div>
-
-      <div class="explain" id="explain" style="display:none"></div>
-
-      <div id="usedArea" class="small" style="margin-top:8px"></div>
-    </div>
+    <footer>Designed for classroom use — resize this page when embedding in an &lt;iframe&gt; (it is responsive).</footer>
   </div>
 
   <script>
-    // question bank (same 24 items from previous file)
+    // same 24 question bank
     const bank = [
       {q: 'Which modal is most appropriate to ask for formal permission?','choices':['Can I leave early?','Could I leave early?','May I leave early?','Will I leave early?'],'correct':2,'ex':'"May" is the most formal way to ask for permission.'},
       {q:'Which sentence shows asking permission politely using "could"?','choices':['Could I turn on the TV?','Could you turn on the TV?','Can I turn on the TV?','May I turn on the TV?'],'correct':0,'ex':'"Could I..." is a polite way to ask for permission for yourself.'},
@@ -108,16 +166,16 @@
       {q:'Which structure is used to ask politeness about someone else doing something?','choices':['Would you mind + Ving','Could I + V','May I + V','Can I + V'],'correct':0,'ex':'"Would you mind + Ving" makes very polite requests about someone else doing something.'}
     ];
 
-    // game state for 4 teams
+    // state
     let remainingIdx = [];
     let asked = [];
-    let current = null; // index in bank
+    let current = null;
     let currentTeam = 0; // 0..3
     let scores = [0,0,0,0];
 
     // DOM refs
     const remainingEl = document.getElementById('remaining');
-    const bar = document.getElementById('bar');
+    const barEl = document.getElementById('bar');
     const questionEl = document.getElementById('question');
     const choicesEl = document.getElementById('choices');
     const explainEl = document.getElementById('explain');
@@ -139,7 +197,7 @@
       scores = [0,0,0,0];
       updateScoresUI();
       remainingEl.textContent = remainingIdx.length;
-      bar.style.width = '0%';
+      barEl.style.width = '0%';
       questionEl.textContent = 'Click Start Game to begin.';
       choicesEl.innerHTML = '';
       explainEl.style.display = 'none';
@@ -149,6 +207,7 @@
       passBtn.disabled = true;
       revealBtn.disabled = true;
       updateActiveUI();
+      document.getElementById('usedArea').textContent = 'Asked questions will appear here.';
     }
 
     function pick(){
@@ -158,7 +217,7 @@
       asked.push(idx);
       remainingEl.textContent = remainingIdx.length;
       const done = asked.length;
-      bar.style.width = `${(done/bank.length)*100}%`;
+      barEl.style.width = `${(done/bank.length)*100}%`;
       return idx;
     }
 
@@ -185,37 +244,17 @@
     }
 
     function onChoice(e){
-      // treat as team answer attempt
       const choiceEl = e.currentTarget;
       if (choiceEl.classList.contains('disabled')) return;
       const picked = Number(choiceEl.dataset.index);
       const correct = bank[current].correct;
-      // disable all
       Array.from(choicesEl.children).forEach(ch=>{
         ch.classList.add('disabled');
         if (Number(ch.dataset.index) === correct) ch.classList.add('correct');
         if (Number(ch.dataset.index) === picked && picked !== correct) ch.classList.add('wrong');
       });
-      if (picked === correct){
-        // award points to current team
-        scores[currentTeam] += 10;
-        explainEl.innerHTML = `<strong>Correct.</strong> ${bank[current].ex}`;
-      } else {
-        explainEl.innerHTML = `<strong>Incorrect.</strong> ${bank[current].ex}`;
-      }
-      explainEl.style.display = 'block';
-      updateScoresUI();
-      // after answering, allow next and rotate
-      nextBtn.disabled = false;
-      correctBtn.disabled = true;
-      wrongBtn.disabled = true;
-      passBtn.disabled = true;
-      revealBtn.disabled = true;
-    }
-
-    function awardCorrect(){
-      scores[currentTeam] += 10;
-      explainEl.innerHTML = `<strong>Correct.</strong> ${bank[current].ex}`;
+      if (picked === correct){ scores[currentTeam] += 10; explainEl.innerHTML = `<strong>Correct.</strong> ${bank[current].ex}`; }
+      else { explainEl.innerHTML = `<strong>Incorrect.</strong> ${bank[current].ex}`; }
       explainEl.style.display = 'block';
       updateScoresUI();
       nextBtn.disabled = false;
@@ -223,106 +262,40 @@
       wrongBtn.disabled = true;
       passBtn.disabled = true;
       revealBtn.disabled = true;
+      updateUsedArea();
     }
 
-    function markWrong(){
-      explainEl.innerHTML = `<strong>Incorrect.</strong> ${bank[current].ex}`;
-      explainEl.style.display = 'block';
-      nextBtn.disabled = false;
-      correctBtn.disabled = true;
-      wrongBtn.disabled = true;
-      passBtn.disabled = true;
-      revealBtn.disabled = true;
-    }
+    function awardCorrect(){ scores[currentTeam] += 10; explainEl.innerHTML = `<strong>Correct.</strong> ${bank[current].ex}`; explainEl.style.display = 'block'; updateScoresUI(); nextBtn.disabled = false; correctBtn.disabled = true; wrongBtn.disabled = true; passBtn.disabled = true; revealBtn.disabled = true; updateUsedArea(); }
+    function markWrong(){ explainEl.innerHTML = `<strong>Incorrect.</strong> ${bank[current].ex}`; explainEl.style.display = 'block'; nextBtn.disabled = false; correctBtn.disabled = true; wrongBtn.disabled = true; passBtn.disabled = true; revealBtn.disabled = true; updateUsedArea(); }
+    function passQuestion(){ explainEl.innerHTML = `<strong>Passed.</strong> Answer: ${bank[current].choices[bank[current].correct]}.`; explainEl.style.display = 'block'; nextBtn.disabled = false; correctBtn.disabled = true; wrongBtn.disabled = true; passBtn.disabled = true; revealBtn.disabled = true; updateUsedArea(); }
+    function revealAnswer(){ Array.from(choicesEl.children).forEach(ch=>{ ch.classList.add('disabled'); if (Number(ch.dataset.index) === bank[current].correct) ch.classList.add('correct'); }); explainEl.style.display = 'block'; explainEl.textContent = `Answer: ${bank[current].choices[bank[current].correct]}. ${bank[current].ex}`; nextBtn.disabled = false; correctBtn.disabled = true; wrongBtn.disabled = true; passBtn.disabled = true; revealBtn.disabled = true; updateUsedArea(); }
 
-    function passQuestion(){
-      explainEl.innerHTML = `<strong>Passed.</strong> The answer was: ${bank[current].choices[bank[current].correct]}.`;
-      explainEl.style.display = 'block';
-      nextBtn.disabled = false;
-      correctBtn.disabled = true;
-      wrongBtn.disabled = true;
-      passBtn.disabled = true;
-      revealBtn.disabled = true;
-    }
+    function nextTurn(){ currentTeam = (currentTeam + 1) % 4; updateActiveUI(); const idx = pick(); if (idx === null){ questionEl.textContent = 'All questions completed.'; choicesEl.innerHTML = ''; explainEl.style.display = 'block'; explainEl.textContent = `Game over. Final scores:
+${scores.map((s,i)=>`${getTeamName(i)}: ${s}`).join('
+')}`; nextBtn.disabled = true; correctBtn.disabled = true; wrongBtn.disabled = true; passBtn.disabled = true; revealBtn.disabled = true; updateUsedArea(); return; } renderQuestion(idx); updateUsedArea(); }
 
-    function revealAnswer(){
-      Array.from(choicesEl.children).forEach(ch=>{
-        ch.classList.add('disabled');
-        if (Number(ch.dataset.index) === bank[current].correct) ch.classList.add('correct');
-      });
-      explainEl.style.display = 'block';
-      explainEl.textContent = `Answer: ${bank[current].choices[bank[current].correct]}. ${bank[current].ex}`;
-      nextBtn.disabled = false;
-      correctBtn.disabled = true;
-      wrongBtn.disabled = true;
-      passBtn.disabled = true;
-      revealBtn.disabled = true;
-    }
+    function updateScoresUI(){ for(let i=0;i<4;i++) document.getElementById('s'+i).textContent = scores[i]; }
+    function getTeamName(i){ const input = document.getElementById('t'+i); return input ? (input.value || `Team ${i+1}`) : `Team ${i+1}`; }
+    function updateActiveUI(){ Array.from(teamsContainer.children).forEach(ch=>{ const idx = Number(ch.dataset.index); if (idx === currentTeam) ch.classList.add('active'); else ch.classList.remove('active'); }); activeName.textContent = getTeamName(currentTeam); }
+    function updateUsedArea(){ if (asked.length === 0) { document.getElementById('usedArea').textContent = 'Asked questions will appear here.'; return; } const list = asked.map((i,idx)=>`${idx+1}. ${bank[i].q}`).join('
+'); document.getElementById('usedArea').innerHTML = '<pre style="margin:0">'+escapeHtml(list)+'</pre>'; }
+    function escapeHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-    function nextTurn(){
-      // rotate team
-      currentTeam = (currentTeam + 1) % 4;
-      updateActiveUI();
-      // pick next question
-      const idx = pick();
-      if (idx === null){
-        questionEl.textContent = 'All questions completed.';
-        choicesEl.innerHTML = '';
-        explainEl.style.display = 'block';
-        explainEl.textContent = `Game over. Final scores:\n${scores.map((s,i)=>`${getTeamName(i)}: ${s}`).join('\n')}`;
-        nextBtn.disabled = true;
-        correctBtn.disabled = true;
-        wrongBtn.disabled = true;
-        passBtn.disabled = true;
-        revealBtn.disabled = true;
-        return;
-      }
-      renderQuestion(idx);
-    }
-
-    function updateScoresUI(){
-      for(let i=0;i<4;i++) document.getElementById('s'+i).textContent = scores[i];
-    }
-
-    function getTeamName(i){
-      const input = document.getElementById('t'+i);
-      return input ? input.value || `Team ${i+1}` : `Team ${i+1}`;
-    }
-
-    function updateActiveUI(){
-      // highlight active team
-      Array.from(teamsContainer.children).forEach(ch=>{
-        const idx = Number(ch.dataset.index);
-        if (idx === currentTeam) ch.classList.add('active'); else ch.classList.remove('active');
-      });
-      activeName.textContent = getTeamName(currentTeam);
-    }
-
-    // wire buttons
-    startBtn.addEventListener('click', ()=>{
-      init();
-      // allow setting team names from top inputs
-      for(let i=0;i<4;i++){
-        const top = document.getElementById('team'+i+'Name');
-        const inpt = document.getElementById('t'+i);
-        if (top && inpt) inpt.value = top.value || inpt.value;
-      }
-      const idx = pick();
-      if (idx!==null) renderQuestion(idx);
-    });
-
-    nextBtn.addEventListener('click', ()=>{
-      nextTurn();
-    });
-
+    // button wiring
+    startBtn.addEventListener('click', ()=>{ init(); // copy top team-name inputs (if present)
+      for(let i=0;i<4;i++){ const top = document.getElementById('team'+i+'Name'); const inpt = document.getElementById('t'+i); if (top && inpt) inpt.value = top.value || inpt.value; }
+      const idx = pick(); if (idx!==null) renderQuestion(idx); updateUsedArea(); });
+    nextBtn.addEventListener('click', ()=>{ nextTurn(); });
     correctBtn.addEventListener('click', ()=>{ awardCorrect(); });
     wrongBtn.addEventListener('click', ()=>{ markWrong(); });
     passBtn.addEventListener('click', ()=>{ passQuestion(); });
     revealBtn.addEventListener('click', ()=>{ revealAnswer(); });
-
     resetBtn.addEventListener('click', ()=>{ init(); });
 
-    // initialize on load
+    // allow clicking team to set active
+    Array.from(teamsContainer.children).forEach(ch=>{ ch.addEventListener('click', ()=>{ currentTeam = Number(ch.dataset.index); updateActiveUI(); }); });
+
+    // init on load
     init();
   </script>
 </body>
