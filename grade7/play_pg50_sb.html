@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Dangal: Randomized Reading Comprehension</title>
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;max-width:860px;margin:28px auto;padding:20px;color:#222}
+    h1{font-size:20px;margin-bottom:8px}
+    .card{border:1px solid #ddd;padding:18px;border-radius:8px;background:#fafafa}
+    .question{font-size:18px;margin:14px 0}
+    .answer{font-size:16px;margin:12px 0;color:#00529b;display:none}
+    .controls{display:flex;gap:10px;flex-wrap:wrap}
+    button{padding:8px 12px;border-radius:6px;border:1px solid #888;background:#fff;cursor:pointer}
+    button:disabled{opacity:0.5;cursor:not-allowed}
+    .meta{margin-top:12px;color:#555}
+    .small{font-size:13px;color:#666}
+    pre{background:#fff;padding:8px;border-radius:6px;border:1px solid #eee}
+  </style>
+</head>
+<body>
+  <h1>Reading Comprehension — Random Question Generator</h1>
+  <div class="card">
+    <div class="small">Questions remaining: <span id="remainingCount">20</span></div>
+    <div class="question" id="questionText">Click <strong>Next Question</strong> to start.</div>
+    <div class="answer" id="answerText"></div>
+
+    <div class="controls">
+      <button id="revealBtn" disabled>Reveal Answer</button>
+      <button id="nextBtn">Next Question</button>
+      <button id="resetBtn">Reset</button>
+      <button id="showUsedBtn">Show Asked Questions</button>
+    </div>
+
+    <div class="meta" id="metaArea"></div>
+  </div>
+
+  <script>
+    // Question bank (20 Q&A pairs)
+    const qa = [
+      {q: "What year is Dangal described as one of the best movies of?", a: "2017"},
+      {q: "What country is the movie Dangal from?", a: "India"},
+      {q: "Who is the producer of Dangal?", a: "Aamir Khan"},
+      {q: "Who is the main actor in the movie?", a: "Aamir Khan"},
+      {q: "Which famous Indian actress plays Geeta Phogat?", a: "Fatima Sana Shaikh"},
+      {q: "What is the movie Dangal based on?", a: "The true story of the Phogat family"},
+      {q: "What is Mahavir Singh Phogat's profession in the story?", a: "He is an amateur wrestler"},
+      {q: "How many daughters does Mahavir Singh Phogat have?", a: "Two daughters"},
+      {q: "What are the names of Mahavir's daughters?", a: "Geeta Phogat and Babita Phogat"},
+      {q: "What sport does Mahavir want his daughters to learn?", a: "Wrestling"},
+      {q: "How do Geeta and Babita feel about wrestling at first?", a: "They hate wrestling at first"},
+      {q: "What does Mahavir help his daughters do after they begin training?", a: "He trains them and helps them change their minds"},
+      {q: "What do Geeta and Babita eventually become?", a: "Professional wrestlers"},
+      {q: "What achievements do Geeta and Babita earn as professional wrestlers?", a: "They win gold medals and become international champions"},
+      {q: "How does the writer describe the type of movie Dangal is?", a: "A great biographical movie"},
+      {q: "Why does the writer think the movie is great?", a: "Because its story is great"},
+      {q: "What does the writer say about the amount of action in the movie?", a: "There is a lot of action in it"},
+      {q: "Why does the writer recommend watching the movie on the weekend?", a: "Because it is perfect for weekend sports movie lovers"},
+      {q: "How many stars does the writer give the movie?", a: "Five stars"},
+      {q: "Who does the writer think will especially enjoy Dangal?", a: "Sports movie lovers"}
+    ];
+
+    let remaining = [];
+    let asked = []; // store indices of asked questions
+    const questionText = document.getElementById('questionText');
+    const answerText = document.getElementById('answerText');
+    const revealBtn = document.getElementById('revealBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const remainingCount = document.getElementById('remainingCount');
+    const metaArea = document.getElementById('metaArea');
+    const showUsedBtn = document.getElementById('showUsedBtn');
+
+    function init() {
+      remaining = Array.from({length: qa.length}, (_,i) => i);
+      asked = [];
+      updateRemaining();
+      questionText.textContent = 'Click Next Question to start.';
+      answerText.style.display = 'none';
+      answerText.textContent = '';
+      revealBtn.disabled = true;
+      nextBtn.disabled = false;
+    }
+
+    function updateRemaining() {
+      remainingCount.textContent = remaining.length;
+    }
+
+    function pickRandomIndex() {
+      if (remaining.length === 0) return null;
+      const r = Math.floor(Math.random() * remaining.length);
+      const idx = remaining.splice(r, 1)[0]; // remove from remaining
+      asked.push(idx);
+      updateRemaining();
+      return idx;
+    }
+
+    let currentIdx = null;
+
+    nextBtn.addEventListener('click', () => {
+      answerText.style.display = 'none';
+      answerText.textContent = '';
+      currentIdx = pickRandomIndex();
+      if (currentIdx === null) {
+        questionText.textContent = 'All questions have been shown.';
+        metaArea.textContent = 'You may click Reset to start again.';
+        revealBtn.disabled = true;
+        nextBtn.disabled = true;
+        return;
+      }
+      // Display question number (1-based) and text
+      questionText.textContent = `Question (${asked.length} shown): ${qa[currentIdx].q}`;
+      metaArea.textContent = '';
+      revealBtn.disabled = false;
+    });
+
+    revealBtn.addEventListener('click', () => {
+      if (currentIdx === null) return;
+      answerText.style.display = 'block';
+      answerText.textContent = `Answer: ${qa[currentIdx].a}`;
+      revealBtn.disabled = true;
+    });
+
+    // Reset without a confirm dialog (some embedded previews block confirm()).
+    resetBtn.addEventListener('click', () => {
+      init();
+      currentIdx = null;
+      metaArea.textContent = '';
+    });
+
+    showUsedBtn.addEventListener('click', () => {
+      if (asked.length === 0) {
+        metaArea.textContent = 'No questions have been shown yet.';
+        return;
+      }
+      const list = asked.map((i,idx) => `${idx+1}. Q${i+1}: ${qa[i].q}`).join('\n');
+      // show in a small pre block
+      metaArea.innerHTML = '<strong>Asked questions:</strong><pre style="white-space:pre-wrap">'+escapeHtml(list)+'</pre>';
+    });
+
+    function escapeHtml(s){
+      return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    // initialize on load
+    init();
+  </script>
+</body>
+</html>
