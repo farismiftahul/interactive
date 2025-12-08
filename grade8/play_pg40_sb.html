@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Request or Permission – Sorting Game</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 20px; }
+  h1 { margin-bottom: 10px; }
+  .container { display: flex; gap: 30px; }
+  .column { flex: 1; border: 2px dashed #aaa; padding: 15px; border-radius: 8px; min-height: 250px; }
+  .column h2 { text-align: center; }
+  .card { background: #fff; padding: 10px; border: 1px solid #ccc; border-radius: 6px; margin-bottom: 8px; cursor: grab; }
+  .correct { background: #dff0d8; border-color: #3c763d; }
+  .wrong { background: #f2dede; border-color: #a94442; }
+  #check { margin-top: 20px; padding: 10px 16px; }
+</style>
+</head>
+<body>
+<h1>Request or Permission? Drag each sentence to the correct box.</h1>
+<div class="container">
+  <div class="column" id="requests"><h2>REQUEST</h2></div>
+  <div class="column" id="permissions"><h2>PERMISSION</h2></div>
+</div>
+<h3>Sentences</h3>
+<div id="card-list"></div>
+<button id="check">Check Answers</button>
+<script>
+const dialogues = [
+  { id: 1, text: "Can I ask you something?", type: "permission" },
+  { id: 2, text: "Can I go to the cinema tomorrow evening?", type: "permission" },
+  { id: 3, text: "Could we get three tickets for the show tonight?", type: "request" },
+  { id: 4, text: "May I see your ID cards, please?", type: "request" },
+  { id: 5, text: "Could you please turn off your cell phone?", type: "request" },
+  { id: 6, text: "Could we have three bars of chocolate?", type: "request" },
+  { id: 7, text: "Could you pass me your tickets, please?", type: "request" },
+  { id: 8, text: "Would you mind if I asked you something?", type: "permission" },
+  { id: 9, text: "Could you please tell me where the restrooms are?", type: "request" },
+  { id: 10, text: "You can pick either of them.", type: "permission" }
+];
+const cardList=document.getElementById("card-list");
+dialogues.forEach(item=>{const card=document.createElement("div");card.className="card";card.draggable=true;card.textContent=`(${item.id}) ${item.text}`;card.dataset.type=item.type;card.addEventListener("dragstart",e=>{e.dataTransfer.setData("text/plain",JSON.stringify({id:item.id,type:item.type}));});cardList.appendChild(card);});
+const columns=document.querySelectorAll(".column, #card-list");columns.forEach(col=>{col.addEventListener("dragover",e=>e.preventDefault());col.addEventListener("drop",e=>{e.preventDefault();const data=JSON.parse(e.dataTransfer.getData("text/plain"));const card=[...document.querySelectorAll(".card")].find(c=>c.textContent.startsWith(`(${data.id})`));col.appendChild(card);});});
+document.getElementById("check").addEventListener("click",()=>{document.querySelectorAll(".card").forEach(card=>{const correctType=card.dataset.type;const parentId=card.parentElement.id;if((parentId==="requests"&&correctType==="request")||(parentId==="permissions"&&correctType==="permission")){card.classList.add("correct");card.classList.remove("wrong");}else{card.classList.add("wrong");card.classList.remove("correct");}});});
+</script>
+</body>
+</html>
