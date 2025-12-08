@@ -2,101 +2,77 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<title>Group Game — Request or Permission (Team Play)</title>
+<title>Group Game — Request/Permission (robust placement)</title>
 <style>
-  :root{--accent:#2979ff}
-  body{font-family:Arial, sans-serif;margin:18px;color:#111}
-  h1{margin:0 0 12px;font-size:20px}
-  .top{display:flex;gap:18px;align-items:center}
-  .controls{background:#f7f7f7;padding:12px;border:1px solid #e0e0e0;border-radius:8px}
-  label{display:block;margin:8px 0 4px;font-size:13px}
-  input[type=number]{width:70px;padding:6px}
-  input.group-name{padding:6px;margin:4px 0;width:160px}
-  button{padding:8px 10px;border-radius:6px;border:0;background:var(--accent);color:#fff;cursor:pointer}
-  button.ghost{background:#eee;color:#222}
-  .game{display:flex;gap:18px;margin-top:14px}
-  .left{width:340px}
-  .groups{display:flex;flex-direction:column;gap:8px}
-  .group{display:flex;align-items:center;gap:8px;padding:8px;border-radius:6px;border:1px solid #ddd;background:#fff}
-  .group.active{box-shadow:0 0 0 3px rgba(41,121,255,0.08);border-color:var(--accent)}
-  .group .score{margin-left:auto;font-weight:700}
+  body{font-family:Arial;margin:18px;color:#111}
+  h1{font-size:18px;margin-bottom:8px}
+  .layout{display:flex;gap:14px}
+  .left{width:300px}
+  .controls{background:#f7f7f7;padding:10px;border-radius:8px;border:1px solid #e6e6e6}
+  .groups{display:flex;flex-direction:column;gap:6px;margin:8px 0}
+  .group{padding:8px;border-radius:6px;border:1px solid #ddd;background:#fff;display:flex;align-items:center;gap:8px}
+  .group.active{outline:3px solid rgba(41,121,255,0.12)}
   .board{flex:1;display:flex;flex-direction:column;gap:12px}
-  .zones{display:flex;gap:12px}
-  .zone{flex:1;border:2px dashed #bbb;border-radius:8px;min-height:220px;padding:10px;background:#fafafa}
-  .zone h3{text-align:center;margin:2px 0 10px}
-  .cards{display:flex;flex-direction:column;gap:8px}
-  .card{background:#fff;padding:10px;border:1px solid #ccc;border-radius:6px;cursor:grab}
-  .card.selected{outline:3px solid rgba(41,121,255,0.15)}
+  .zones{display:flex;gap:10px}
+  .zone{flex:1;border:2px dashed #bbb;border-radius:8px;min-height:180px;padding:10px;background:#fafafa}
+  .zone h3{text-align:center;margin:2px 0 8px}
+  .card{background:#fff;padding:8px;border:1px solid #ccc;border-radius:6px;margin-bottom:8px;cursor:grab}
+  .card.selected{box-shadow:0 0 0 3px rgba(41,121,255,0.10)}
   .card.assigned{opacity:0.6;cursor:default}
+  .pool{border:1px solid #eee;padding:8px;border-radius:6px;background:#fff;min-height:80px}
+  .actions{margin-top:8px;display:flex;gap:6px}
+  button{padding:8px 10px;border-radius:6px;border:0;background:#2979ff;color:#fff;cursor:pointer}
+  button.ghost{background:#eee;color:#222}
   .meta{font-size:12px;color:#666;margin-top:6px}
-  .footer{margin-top:12px;display:flex;gap:8px;align-items:center}
-  .status{font-size:14px}
-  .small{font-size:13px;color:#555}
-  .teacher-controls{margin-top:8px;display:flex;gap:8px;align-items:center}
+  .status{font-size:13px;margin-top:8px}
 </style>
 </head>
 <body>
-<h1>Group Game — Request or Permission (Team Play)</h1>
-<div class="top">
-  <div class="controls">
-    <label>Number of groups (2–10)</label>
-    <input id="groupCount" type="number" min="2" max="10" value="5" />
-    <div id="namesContainer" style="margin-top:8px"></div>
-    <div style="margin-top:8px">
-      <button id="apply">Apply groups</button>
-      <button id="resetAll" class="ghost">Reset game</button>
-    </div>
-    <div class="teacher-controls">
-      <label style="margin:0"><input type="checkbox" id="lockOnScore"> Lock cards on scoring</label>
-      <button id="forceLock" class="ghost">Teacher: Lock all assigned</button>
-      <button id="unlockAll" class="ghost">Teacher: Unlock all</button>
-    </div>
-  </div>
-  <div style="margin-left:12px">
-    <div class="small">Instructions:</div>
-    <div class="small">1) Set groups and names. 2) Press <strong>Start Round</strong> to begin with the first group. 3) During a group's turn they drag/tap any number of cards into REQUEST or PERMISSION. 4) Press <strong>End Turn</strong> to score that group's placed cards. If "Lock cards on scoring" is checked, scored cards are locked.</div>
-  </div>
-</div>
+<h1>Group Game — Request or Permission (placement fallback included)</h1>
 
-<div class="game">
+<div class="layout">
   <div class="left">
-    <div style="margin-bottom:8px"><strong>Teams</strong></div>
-    <div class="groups" id="groupsList"></div>
-    <div style="margin-top:12px">
-      <button id="startRound">Start Round</button>
-      <button id="endTurn" class="ghost">End Turn</button>
+    <div class="controls">
+      <div><strong>Teams</strong></div>
+      <div style="margin-top:8px">
+        <label>Groups: <input id="groupCount" type="number" min="2" max="10" value="5" style="width:60px;padding:4px"/></label>
+        <button id="apply" style="margin-left:6px">Apply</button>
+      </div>
+      <div class="groups" id="groupsList"></div>
+
+      <div style="margin-top:8px">
+        <button id="startRound">Start Round</button>
+        <button id="endTurn" class="ghost">End Turn</button>
+        <div class="status" id="status">Round not started.</div>
+      </div>
+
+      <div style="margin-top:10px">
+        <div><strong>Placement helper (works on mobile)</strong></div>
+        <div class="actions" style="margin-top:6px">
+          <button id="placeRequest" class="ghost">Place → REQUEST</button>
+          <button id="placePermission" class="ghost">Place → PERMISSION</button>
+        </div>
+        <div style="margin-top:8px"><button id="resetBtn" class="ghost">Reset game</button></div>
+      </div>
     </div>
   </div>
 
   <div class="board">
     <div class="zones">
-      <div class="zone" id="requestsZone">
-        <h3>REQUEST</h3>
-        <div class="cards" id="requestsColumn"></div>
-      </div>
-      <div class="zone" id="permissionsZone">
-        <h3>PERMISSION</h3>
-        <div class="cards" id="permissionsColumn"></div>
-      </div>
+      <div class="zone" id="requestsZone"><h3>REQUEST</h3><div id="requestsColumn"></div></div>
+      <div class="zone" id="permissionsZone"><h3>PERMISSION</h3><div id="permissionsColumn"></div></div>
     </div>
 
     <div>
-      <h3>Available Sentences</h3>
-      <div class="cards" id="cardPool"></div>
-    </div>
-
-    <div class="footer">
-      <div class="status" id="status">Round not started.</div>
-      <div style="margin-left:auto">
-        <button id="shuffle" class="ghost">Shuffle cards</button>
-        <button id="checkAll" class="ghost">Reveal correct answers</button>
-      </div>
+      <h3>Available sentences</h3>
+      <div class="pool" id="cardPool"></div>
+      <div class="meta" id="selectedMeta">No sentence selected.</div>
     </div>
   </div>
 </div>
 
 <script>
-// default dialogues (editable)
+/* ----- dialogues (editable) ----- */
 const dialogues = [
   {id:1, text:"Excuse me, could I borrow your pen?", type:"request"},
   {id:2, text:"May I leave early today?", type:"permission"},
@@ -112,201 +88,194 @@ const dialogues = [
   {id:12, text:"May I see the menu, please?", type:"request"}
 ];
 
-// UI elements
-const groupCountEl = document.getElementById('groupCount');
-const namesContainer = document.getElementById('namesContainer');
-const applyBtn = document.getElementById('apply');
-const groupsList = document.getElementById('groupsList');
+/* ----- state and UI refs ----- */
+let cards = []; // {id,text,type,assigned,placedIn,placedBy}
+let groups = []; // {name,score}
+let currentGroup = null; // index
+let roundActive = false;
+let selectedCardId = null;
+
 const cardPool = document.getElementById('cardPool');
 const requestsColumn = document.getElementById('requestsColumn');
 const permissionsColumn = document.getElementById('permissionsColumn');
-const statusEl = document.getElementById('status');
+const groupsList = document.getElementById('groupsList');
+const groupCountEl = document.getElementById('groupCount');
+const applyBtn = document.getElementById('apply');
 const startBtn = document.getElementById('startRound');
 const endBtn = document.getElementById('endTurn');
-const shuffleBtn = document.getElementById('shuffle');
-const checkAllBtn = document.getElementById('checkAll');
-const resetAllBtn = document.getElementById('resetAll');
-const lockOnScoreEl = document.getElementById('lockOnScore');
-const forceLockBtn = document.getElementById('forceLock');
-const unlockAllBtn = document.getElementById('unlockAll');
+const statusEl = document.getElementById('status');
+const placeRequestBtn = document.getElementById('placeRequest');
+const placePermissionBtn = document.getElementById('placePermission');
+const resetBtn = document.getElementById('resetBtn');
+const selectedMeta = document.getElementById('selectedMeta');
 
-let groups = []; // {name,score}
-let currentGroupIndex = null; // which group's turn
-let roundActive = false;
-let cards = [];
-let selectedCardId = null; // for click/tap placement fallback
-
-function buildNameInputs(){
-  namesContainer.innerHTML = '';
-  const count = Number(groupCountEl.value) || 5;
-  for(let i=0;i<count;i++){
-    const inp = document.createElement('input');
-    inp.className='group-name';
-    inp.placeholder=`Group ${i+1}`;
-    inp.dataset.index=i;
-    namesContainer.appendChild(inp);
-  }
+/* ----- functions ----- */
+function init(){
+  cards = dialogues.map(d=>({ ...d, assigned:false, placedIn:null, placedBy:null }));
+  buildGroups(Number(groupCountEl.value || 5));
+  renderAll();
 }
 
-function applyGroups(){
-  const count = Math.max(2, Math.min(10, Number(groupCountEl.value)||5));
-  groupCountEl.value = count;
-  const inputs = namesContainer.querySelectorAll('.group-name');
+function buildGroups(n){
   groups = [];
-  for(let i=0;i<count;i++){
-    const name = (inputs[i] && inputs[i].value.trim()) || `Group ${i+1}`;
-    groups.push({name, score:0});
-  }
+  for(let i=0;i<n;i++) groups.push({ name:`Group ${i+1}`, score:0 });
   renderGroups();
 }
 
 function renderGroups(){
-  groupsList.innerHTML='';
+  groupsList.innerHTML = '';
   groups.forEach((g,i)=>{
     const el = document.createElement('div');
-    el.className='group'+(i===currentGroupIndex? ' active':'');
-    el.innerHTML = `<div class="name">${g.name}</div><div class="score">${g.score}</div>`;
+    el.className = 'group' + (currentGroup===i ? ' active':'');
+    el.textContent = `${g.name} — ${g.score}`;
     groupsList.appendChild(el);
   });
 }
 
-function resetGame(){
-  roundActive=false; currentGroupIndex=null; statusEl.textContent='Round not started.'; groups.forEach(g=>g.score=0); renderGroups();
-  initCards();
+function renderAll(){
+  renderPool();
+  renderColumns();
+  renderGroups();
+  updateSelectedMeta();
 }
 
-function initCards(){
-  cards = dialogues.map(d=>({...d, assigned:false, placedIn:null, placedBy:null}));
-  renderColumnsAndPool();
-}
-
-function renderCardElement(c){
-  const el = document.createElement('div');
-  el.className = 'card' + (c.assigned? ' assigned':'') + (selectedCardId==c.id? ' selected':'');
-  el.draggable = !c.assigned;
-  el.dataset.id = c.id;
-  el.textContent = `(${c.id}) ${c.text}`;
-  if(c.placedIn){ const meta = document.createElement('div'); meta.className='meta'; meta.textContent = `Placed: ${c.placedIn} by ${c.placedBy!==null? groups[c.placedBy].name : ''}`; el.appendChild(meta); }
-
-  // dragstart uses id string
-  el.addEventListener('dragstart', e=>{
-    if(c.assigned) { e.preventDefault(); return; }
-    e.dataTransfer.setData('text/plain', String(c.id));
-  });
-
-  // click/tap: select card for placement (mobile fallback)
-  el.addEventListener('click', e=>{
+function renderPool(){
+  cardPool.innerHTML = '';
+  cards.forEach(c=>{
+    // pool shows unassigned + unplaced, and also placed-but-not-assigned (so teacher/students can move)
+    // we will show everything that is not assigned in the pool for selection.
     if(c.assigned) return;
-    // toggle selection
-    if(selectedCardId===c.id) selectedCardId = null; else selectedCardId = c.id;
-    renderColumnsAndPool();
+    const el = document.createElement('div');
+    el.className = 'card' + (selectedCardId===c.id ? ' selected':'');
+    el.draggable = true;
+    el.dataset.id = c.id;
+    el.textContent = `(${c.id}) ${c.text}`;
+    // dragstart: set id as string
+    el.addEventListener('dragstart', e=> {
+      e.dataTransfer.setData('text/plain', String(c.id));
+    });
+    // click selects
+    el.addEventListener('click', ()=> {
+      selectedCardId = (selectedCardId===c.id) ? null : c.id;
+      renderAll();
+    });
+    // if the card is placed, show small meta
+    if(c.placedIn){
+      const m = document.createElement('div'); m.className='meta';
+      m.textContent = `Placed: ${c.placedIn} by ${groups[c.placedBy].name}`;
+      el.appendChild(m);
+    }
+    cardPool.appendChild(el);
   });
-
-  return el;
 }
 
-function findCardById(id){ return cards.find(x=>String(x.id)===String(id)); }
+function renderColumns(){
+  requestsColumn.innerHTML=''; permissionsColumn.innerHTML='';
+  cards.forEach(c=>{
+    if(!c.placedIn) return;
+    const el = document.createElement('div');
+    el.className = 'card' + (c.assigned ? ' assigned':'');
+    el.textContent = `(${c.id}) ${c.text}`;
+    if(c.assigned){
+      const m = document.createElement('div'); m.className='meta';
+      m.textContent = `Assigned to ${groups[c.placedBy].name}`;
+      el.appendChild(m);
+    } else {
+      const m = document.createElement('div'); m.className='meta';
+      m.textContent = `Placed by ${groups[c.placedBy].name}`;
+      el.appendChild(m);
+    }
+    if(c.placedIn === 'request') requestsColumn.appendChild(el);
+    else permissionsColumn.appendChild(el);
+  });
+}
 
-// allow drop on zones
+function updateSelectedMeta(){
+  if(!selectedCardId){ selectedMeta.textContent = 'No sentence selected.'; return; }
+  const c = cards.find(x=>x.id===selectedCardId);
+  if(!c) { selectedMeta.textContent = 'Selected sentence not found.'; return; }
+  selectedMeta.textContent = `Selected (${c.id}): "${c.text}" — correct = ${c.type.toUpperCase()}`;
+}
+
+/* ----- placement helpers (robust) ----- */
+function placeSelectedInto(target){ // target: 'request' or 'permission'
+  if(!roundActive || currentGroup===null){ alert('Start the round first.'); return; }
+  if(!selectedCardId){ alert('Select a sentence first (tap it).'); return; }
+  const c = cards.find(x=>x.id===selectedCardId);
+  if(!c) return;
+  if(c.assigned){ alert('This sentence is locked (assigned).'); return; }
+  c.placedIn = target;
+  c.placedBy = currentGroup;
+  // deselect after placing
+  selectedCardId = null;
+  renderAll();
+}
+
+/* drop handling (desktop) */
 [requestsColumn, permissionsColumn].forEach(zone=>{
-  zone.addEventListener('dragover', e=>e.preventDefault());
+  zone.addEventListener('dragover', e=> e.preventDefault());
   zone.addEventListener('drop', e=>{
     e.preventDefault();
-    if(currentGroupIndex===null){ alert('Start the round and select a group first.'); return; }
+    if(!roundActive || currentGroup===null){ alert('Start the round first.'); return; }
     const id = e.dataTransfer.getData('text/plain');
-    placeCardById(id, zone);
-  });
-
-  // click/tap on zone: place selectedCardId (mobile)
-  zone.addEventListener('click', e=>{
-    if(!selectedCardId) return;
-    if(currentGroupIndex===null){ alert('Start the round and select a group first.'); return; }
-    placeCardById(selectedCardId, zone);
+    const c = cards.find(x=>String(x.id)===String(id));
+    if(!c) return;
+    if(c.assigned){ alert('This sentence is locked.'); return; }
+    c.placedIn = (zone===requestsColumn) ? 'request' : 'permission';
+    c.placedBy = currentGroup;
+    selectedCardId = null;
+    renderAll();
   });
 });
 
-function placeCardById(id, zone){
-  const cardObj = findCardById(id);
-  if(!cardObj) return;
-  if(cardObj.assigned){ alert('This card has already been assigned.'); return; }
-  cardObj.placedIn = zone===requestsColumn? 'request' : 'permission';
-  cardObj.placedBy = currentGroupIndex;
-  // after placing, clear selection
-  selectedCardId = null;
-  renderColumnsAndPool();
-}
+/* ----- game flow ----- */
+applyBtn.addEventListener('click', ()=> {
+  const n = Math.max(2, Math.min(10, Number(groupCountEl.value) || 5));
+  buildGroups(n);
+  // reset scores and state
+  groups.forEach(g=>g.score=0);
+  currentGroup = null; roundActive = false; statusEl.textContent = 'Round not started.';
+  cards = dialogues.map(d=>({ ...d, assigned:false, placedIn:null, placedBy:null }));
+  renderAll();
+});
 
-function renderColumnsAndPool(){
-  requestsColumn.innerHTML=''; permissionsColumn.innerHTML=''; cardPool.innerHTML='';
-  cards.forEach(c=>{
-    if(c.placedIn==='request') addCardToColumn(c, requestsColumn);
-    else if(c.placedIn==='permission') addCardToColumn(c, permissionsColumn);
-  });
-  // pool shows unplaced and placed but not assigned (so teams can move during turn)
-  cards.forEach(c=>{
-    if(!c.placedIn){ const el = renderCardElement(c); cardPool.appendChild(el); }
-    else if(!c.assigned){ const el = renderCardElement(c); const meta = document.createElement('div'); meta.className='meta'; meta.textContent = `Placed: ${c.placedIn} by ${groups[c.placedBy].name}`; el.appendChild(meta); cardPool.appendChild(el); }
-  });
-}
-
-function addCardToColumn(c, columnEl){
-  const el = document.createElement('div'); el.className='card' + (c.assigned? ' assigned':''); el.dataset.id=c.id; el.textContent=`(${c.id}) ${c.text}`; 
-  if(c.assigned){ const meta = document.createElement('div'); meta.className='meta'; meta.textContent = `Assigned to ${groups[c.placedBy].name}`; el.appendChild(meta); }
-  columnEl.appendChild(el);
-}
-
-// game controls
-applyBtn.addEventListener('click', ()=>{applyGroups(); resetGame();});
 startBtn.addEventListener('click', ()=>{
   if(groups.length===0) { alert('Apply groups first.'); return; }
-  if(!roundActive){ currentGroupIndex = 0; roundActive = true; statusEl.textContent = `Current turn: ${groups[currentGroupIndex].name}`; renderGroups(); }
-  else { statusEl.textContent = `Round already active. Current: ${groups[currentGroupIndex].name}`; }
-  endBtn.classList.remove('ghost');
+  if(roundActive) { alert('Round already active.'); return; }
+  roundActive = true; currentGroup = 0;
+  statusEl.textContent = 'Current: ' + groups[currentGroup].name;
+  renderGroups();
 });
+
 endBtn.addEventListener('click', ()=>{
-  if(!roundActive || currentGroupIndex===null) return;
-  let points=0; cards.forEach(c=>{
-    if(!c.assigned && c.placedBy===currentGroupIndex){
+  if(!roundActive || currentGroup===null) return;
+  // score placed by current group
+  let pts = 0;
+  cards.forEach(c=>{
+    if(!c.assigned && c.placedBy===currentGroup){
       const correct = (c.type==='request' && c.placedIn==='request') || (c.type==='permission' && c.placedIn==='permission');
-      if(correct) points++;
-      if(lockOnScoreEl.checked) c.assigned = true; 
+      if(correct) pts++;
+      // lock them on score by default? We'll keep unlocked — teacher can lock using Reset/Assign if wanted.
+      c.assigned = c.assigned || false;
     }
   });
-  groups[currentGroupIndex].score += points;
-  const prev = currentGroupIndex;
-  currentGroupIndex = (currentGroupIndex + 1) % groups.length;
-  const allAssigned = cards.every(c=>c.assigned);
-  if(allAssigned){ roundActive=false; currentGroupIndex=null; statusEl.textContent = `Round finished. Final scores shown`; }
-  else { statusEl.textContent = `Last: ${groups[prev].name} scored ${points}. Next: ${groups[currentGroupIndex].name}`; }
-  renderGroups(); renderColumnsAndPool();
+  groups[currentGroup].score += pts;
+  // rotate
+  currentGroup = (currentGroup + 1) % groups.length;
+  statusEl.textContent = `Last scored ${pts}. Next: ${groups[currentGroup].name}`;
+  renderAll();
 });
 
-shuffleBtn.addEventListener('click', ()=>{ cards = shuffle(cards); renderColumnsAndPool(); });
-checkAllBtn.addEventListener('click', ()=>{
-  renderColumnsAndPool();
-  [requestsColumn, permissionsColumn].forEach(zone=>{
-    [...zone.querySelectorAll('.card')].forEach(el=>{
-      const id = el.dataset.id || el.textContent.match(/^\((\d+)\)/)?.[1];
-      const c = findCardById(id);
-      if(!c) return;
-      const correct = (c.type==='request' && c.placedIn==='request') || (c.type==='permission' && c.placedIn==='permission');
-      el.style.background = correct? '#dff0d8' : '#f2dede';
-    });
-  });
+placeRequestBtn.addEventListener('click', ()=> placeSelectedInto('request'));
+placePermissionBtn.addEventListener('click', ()=> placeSelectedInto('permission'));
+
+resetBtn.addEventListener('click', ()=> {
+  if(!confirm('Reset whole game?')) return;
+  init();
 });
 
-forceLockBtn.addEventListener('click', ()=>{ cards.forEach(c=>{ if(c.placedIn) c.assigned = true; }); renderColumnsAndPool(); renderGroups(); });
-unlockAllBtn.addEventListener('click', ()=>{ cards.forEach(c=>{ c.assigned = false; }); renderColumnsAndPool(); renderGroups(); });
-resetAllBtn.addEventListener('click', ()=>{ if(confirm('Reset entire game?')){ applyGroups(); resetGame(); }});
-
-// utilities
-function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; }
-
-// initial setup
-buildNameInputs(); applyGroups(); initCards();
-
-groupCountEl.addEventListener('change', buildNameInputs);
-
+/* initialize */
+init();
 </script>
 </body>
 </html>
