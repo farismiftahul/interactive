@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Wonder Woman — Movie Review Game</title>
+  <style>
+    :root{font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;}
+    body{max-width:980px;margin:18px auto;padding:18px;background:#f7f9fb;color:#222}
+    header{display:flex;gap:18px;align-items:center}
+    img.cover{width:220px;border-radius:6px;box-shadow:0 6px 18px rgba(0,0,0,.12)}
+    h1{font-size:22px;margin:0}
+    .container{display:grid;grid-template-columns:1fr 360px;gap:18px;margin-top:14px}
+    .card{background:white;padding:14px;border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,.06)}
+    .passage{line-height:1.5}
+    .task{margin-top:12px}
+    .task h3{margin:6px 0}
+    .mcq button, .action button{display:block;margin:6px 0;padding:8px 10px;border-radius:6px;border:1px solid #ddd;background:#fafafa;cursor:pointer}
+    .mcq button.correct{border-color:#1e7e34;background:#e6f4ea}
+    .mcq button.wrong{border-color:#b02a37;background:#ffecec}
+    .drag-area{display:flex;gap:8px;flex-wrap:wrap}
+    .draggable{padding:8px 10px;border-radius:6px;background:#eef2ff;border:1px dashed #9aa7ff;cursor:grab}
+    .dropzone{min-height:48px;padding:8px;border-radius:6px;border:2px dashed #ccc;flex:1}
+    textarea{width:100%;min-height:120px;padding:8px;border-radius:6px;border:1px solid #ccc}
+    .score{font-weight:700}
+    footer{font-size:13px;color:#666;margin-top:12px}
+    .small{font-size:13px;color:#555}
+    .rubric{font-size:13px}
+  </style>
+</head>
+<body>
+  <header>
+    <img class="cover" src="https://filmartgallery.com/cdn/shop/products/Wonder-Woman-Vintage-Movie-Poster-Original_23fa78cc.jpg?v=1741717242" alt="Wonder Woman poster"/>
+    <div>
+      <h1>Wonder Woman — Movie Review Game (Writing Prep)</h1>
+      <p class="small">This interactive page guides students from reading comprehension to planning and writing their own movie review.</p>
+      <p class="small">How to use: read the passage on the left, complete the mini-games, then write your review in the box.</p>
+    </div>
+  </header>
+
+  <div class="container">
+    <section>
+      <div class="card">
+        <h2>Reading Passage</h2>
+        <div class="passage" id="passage">
+          <strong>Wonder Woman</strong>
+          <p>My review is about the new DC movie Wonder Woman. It's a fantasy-action movie. Wonder Woman (or Diana) is the princess of the Amazons, and she lives on an island. Diana is a real warrior, and she leaves the island with a soldier because she wants to stop the world war.</p>
+          <p>The director of the film is Petty Jenkins, and I think he is very successful. There are also many stars in the movie. Gal Gadot and Chris Pane are some of the stars in the movie. My favourite character in the movie is Diana / Wonder Woman. She is strong and beautiful. The movie is also great because there is a lot of action in it.</p>
+          <p>Go and see the movie at the weekend. It's a five-star movie.</p>
+        </div>
+
+        <div class="task mcq" aria-labelledby="comp-title">
+          <h3 id="comp-title">1 — Quick comprehension (choose the best answer)</h3>
+
+          <div class="question">
+            <p>Who is Wonder Woman?</p>
+            <button data-correct="true" onclick="checkMCQ(this)">A princess and a warrior</button>
+            <button onclick="checkMCQ(this)">A soldier</button>
+            <button onclick="checkMCQ(this)">The director of the film</button>
+          </div>
+
+          <div class="question" style="margin-top:8px">
+            <p>Why does Diana leave the island?</p>
+            <button data-correct="true" onclick="checkMCQ(this)">To stop the world war</button>
+            <button onclick="checkMCQ(this)">To find treasure</button>
+            <button onclick="checkMCQ(this)">To become the director</button>
+          </div>
+
+          <div class="question" style="margin-top:8px">
+            <p>Who is the director of the movie?</p>
+            <button onclick="checkMCQ(this)">Gal Gadot</button>
+            <button data-correct="true" onclick="checkMCQ(this)">Petty Jenkins</button>
+            <button onclick="checkMCQ(this)">Chris Pane</button>
+          </div>
+
+          <div class="question" style="margin-top:8px">
+            <p>Which actors are stars in the movie?</p>
+            <button data-correct="true" onclick="checkMCQ(this)">Gal Gadot and Chris Pane</button>
+            <button onclick="checkMCQ(this)">Diana and Petty Jenkins</button>
+            <button onclick="checkMCQ(this)">Only Wonder Woman</button>
+          </div>
+
+          <div class="question" style="margin-top:8px">
+            <p>What rating does the reviewer give the movie?</p>
+            <button data-correct="true" onclick="checkMCQ(this)">Five stars</button>
+            <button onclick="checkMCQ(this)">Three stars</button>
+            <button onclick="checkMCQ(this)">One star</button>
+          </div>
+
+        </div>
+
+        <div class="task" id="dragTask">
+          <h3>2 — Identify parts of the review (drag each phrase to the correct box)</h3>
+          <p class="small">Drag the labels into: Title, Summary, Opinions, Recommendation</p>
+          <div class="drag-area" id="labels">
+            <div class="draggable" draggable="true">"Wonder Woman"</div>
+            <div class="draggable" draggable="true">"It's a fantasy-action movie... she leaves the island..."</div>
+            <div class="draggable" draggable="true">"She is strong and beautiful."</div>
+            <div class="draggable" draggable="true">"Go and see the movie at the weekend."</div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <div class="dropzone" data-type="title">Title</div>
+            <div class="dropzone" data-type="summary">Summary</div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <div class="dropzone" data-type="opinion">Opinion</div>
+            <div class="dropzone" data-type="recommend">Recommendation</div>
+          </div>
+          <div style="margin-top:8px"><button onclick="checkDrag()">Check drag-and-drop</button> <span id="dragResult"></span></div>
+        </div>
+
+        <div class="task" id="unscramble">
+          <h3>3 — Sentence unscramble (type the sentence correctly)</h3>
+          <p class="small">Scrambled: "exciting / very / is / movie / the"</p>
+          <input id="unscrambleInput" style="width:100%;padding:8px;border-radius:6px;border:1px solid #ccc" placeholder="Type the correct sentence here" />
+          <div style="margin-top:8px"><button onclick="checkUnscramble()">Check</button> <span id="unscrRes"></span></div>
+        </div>
+
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <h2>Write your own short review</h2>
+        <p class="small">Use the passage as a model. Try to include: title, two-sentence summary, one opinion sentence, and a recommendation + 1–5 star rating.</p>
+        <textarea id="studentReview" placeholder="Write your review here..."></textarea>
+        <div style="display:flex;gap:8px;align-items:center;margin-top:8px">
+          <label for="stars">Your rating:</label>
+          <select id="stars"><option value="5">★★★★★ (5)</option><option value="4">★★★★ (4)</option><option value="3">★★★ (3)</option><option value="2">★★ (2)</option><option value="1">★ (1)</option></select>
+          <button onclick="evaluateReview()">Evaluate my review</button>
+        </div>
+        <div style="margin-top:8px" id="feedback"></div>
+        <div style="margin-top:8px" class="rubric card">
+          <strong>Teacher rubric (quick):</strong>
+          <ul>
+            <li>Title: present and clear (2 pts)</li>
+            <li>Summary: 1–2 sentences that explain plot (4 pts)</li>
+            <li>Opinion: clear opinion sentence with reason (3 pts)</li>
+            <li>Recommendation & rating: present (1 pt)</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <aside>
+      <div class="card">
+        <h3>Hints & Language Frames</h3>
+        <p class="small"><strong>Opening / Title</strong>: "Wonder Woman — A short review"</p>
+        <p class="small"><strong>Summary frame</strong>: "The movie is about... She/He leaves the island because..."</p>
+        <p class="small"><strong>Opinion frame</strong>: "I think the movie is... because..."</p>
+        <p class="small"><strong>Recommendation</strong>: "I recommend this movie because..."</p>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <h3>Progress & Score</h3>
+        <p>Comprehension correct: <span id="compScore">0</span>/5</p>
+        <p>Drag task: <span id="dragScore">0</span>/4</p>
+        <p>Unscramble: <span id="unscrScore">0</span>/1</p>
+        <p class="score">Total mini-game score: <span id="totalScore">0</span>/10</p>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <h3>Teacher tools</h3>
+        <p class="small">Printable peer-review checklist (copy for students):</p>
+        <ol class="small">
+          <li>Is there a clear title?</li>
+          <li>Does the summary explain the plot in 1–2 sentences?</li>
+          <li>Is the opinion sentence supported by a reason?</li>
+          <li>Is there a recommendation and a star rating?</li>
+        </ol>
+      </div>
+    </aside>
+  </div>
+
+  <footer class="small">Designed to prepare students to write a short review based on the provided passage.</footer>
+
+  <script>
+    // MCQ checking
+    function checkMCQ(btn) {
+      // find the question container (closest div with class 'question')
+      const question = btn.closest('.question');
+      if (!question) return; // safety
+      if (question.dataset.answered) return; // already answered
+
+      const all = question.querySelectorAll('button');
+      all.forEach(b => b.disabled = true);
+
+      if (btn.dataset.correct === 'true') {
+        btn.classList.add('correct');
+        // increment numeric score displayed
+        const compEl = document.getElementById('compScore');
+        compEl.textContent = String(parseInt(compEl.textContent || '0', 10) + 1);
+      } else {
+        btn.classList.add('wrong');
+      }
+      question.dataset.answered = '1';
+      updateTotal();
+    }
+
+    // Drag and drop
+    let dragged = null;
+    document.querySelectorAll('.draggable').forEach(el=>{
+      el.addEventListener('dragstart', e=>{ dragged = el; e.dataTransfer.setData('text/plain','drag'); });
+    });
+    document.querySelectorAll('.dropzone').forEach(zone=>{
+      zone.addEventListener('dragover', e=>e.preventDefault());
+      zone.addEventListener('drop', e=>{
+        e.preventDefault();
+        if(dragged) zone.appendChild(dragged);
+      });
+    });
+
+    function checkDrag(){
+      let score = 0;
+      document.querySelectorAll('.dropzone').forEach(zone=>{
+        const type = zone.dataset.type;
+        const text = (zone.textContent || '').toLowerCase();
+        if(type==='title' && text.includes('wonder woman')) score++;
+        if(type==='summary' && text.includes('fantasy')) score++;
+        if(type==='opinion' && (text.includes('strong')|| text.includes('beautiful'))) score++;
+        if(type==='recommend' && text.includes('see the movie')) score++;
+      });
+      document.getElementById('dragScore').textContent = score;
+      document.getElementById('dragResult').textContent = 'Score: '+score+'/4';
+      updateTotal();
+    }
+
+    // Unscramble
+    function checkUnscramble(){
+      const val = document.getElementById('unscrambleInput').value.trim().toLowerCase();
+      const correct = 'the movie is very exciting';
+      if(val === correct || /movie.*exciting/.test(val)){
+        document.getElementById('unscrRes').textContent = 'Correct!';
+        incrementSingle('unscrScore');
+      } else {
+        document.getElementById('unscrRes').textContent = 'Not quite. Try: "The movie is very exciting."';
+      }
+      updateTotal();
+    }
+
+    // Review evaluation (basic automated feedback)
+    function evaluateReview(){
+      const text = document.getElementById('studentReview').value.trim();
+      const stars = document.getElementById('stars').value;
+      const feedback = [];
+      let points = 0;
+
+      if(/wonder woman/i.test(text) || /^\w+/.test(text)) { feedback.push('Title or movie name detected. (2/2)'); points+=2; } else feedback.push('Add a title or the movie name. (0/2)');
+
+      if(/(movie is|is about|the film|she|he|they).{0,80}/i.test(text) && text.split('.').length>=2){ feedback.push('Summary present: 3/4'); points+=3 } else feedback.push('Add a 1–2 sentence summary that explains the plot. (0/4)');
+
+      if(/I think|I believe|In my opinion|strong|beautiful|good|bad|boring|great/i.test(text)){ feedback.push('Opinion sentence present. (2/3)'); points+=2 } else feedback.push('Add a clear opinion sentence and a short reason. (0/3)');
+
+      if(/recommend|see the movie|should see|don\'t see|don’t see|avoid|buy a ticket/i.test(text) || stars>='1') { feedback.push('Recommendation / rating present. (1/1)'); points+=1 } else feedback.push('Add a recommendation and pick a star rating. (0/1)');
+
+      const percent = Math.round(points/10*100);
+      feedback.push('\nAuto-score: '+points+'/10 ('+percent+'%)');
+      feedback.push('Tip: Use the frames on the right and keep your review short: 4–6 sentences.');
+
+      document.getElementById('feedback').innerText = feedback.join('\n');
+    }
+
+    // small helpers for score tracking
+    function increment(id){
+      const el = document.getElementById(id);
+      el.textContent = String(parseInt(el.textContent||'0',10)+1);
+      updateTotal();
+    }
+    function incrementSingle(id){
+      const el = document.getElementById(id);
+      if(el.textContent==='0' || el.textContent==='') el.textContent='1';
+    }
+    function updateTotal(){
+      const c = parseInt(document.getElementById('compScore').textContent||0,10);
+      const d = parseInt(document.getElementById('dragScore').textContent||0,10);
+      const u = parseInt(document.getElementById('unscrScore').textContent||0,10);
+      const total = c + d + u;
+      document.getElementById('totalScore').textContent = total;
+    }
+
+    // init
+    document.getElementById('compScore').textContent = '0';
+    document.getElementById('dragScore').textContent = '0';
+    document.getElementById('unscrScore').textContent = '0';
+    document.getElementById('totalScore').textContent = '0';
+  </script>
+</body>
+</html>
