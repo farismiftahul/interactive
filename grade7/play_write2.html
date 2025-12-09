@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Write a Short Movie Review</title>
+  <style>
+    body{font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial;max-width:820px;margin:20px auto;padding:20px;background:#f5f7fb;color:#111}
+    .card{background:#fff;padding:18px;border-radius:10px;box-shadow:0 6px 20px rgba(12,30,60,.06);margin-bottom:14px}
+    h1{margin:0 0 6px;font-size:20px}
+    label{display:block;margin-top:10px;font-weight:600}
+    input[type=text], textarea, select{width:100%;padding:10px;border-radius:8px;border:1px solid #d7dbe6;font-size:14px}
+    textarea{min-height:140px;resize:vertical}
+    .row{display:flex;gap:10px;align-items:center}
+    .small{font-size:13px;color:#556}
+    button{margin-top:12px;padding:10px 12px;border-radius:8px;border:0;background:#2b6df6;color:#fff;cursor:pointer}
+    button.secondary{background:#6c757d}
+    .feedback{white-space:pre-wrap;margin-top:10px;padding:10px;border-radius:8px;background:#f1f5ff;border:1px solid #dce7ff}
+    .rubric{font-size:13px}
+    .meta{display:flex;gap:12px;align-items:center;margin-top:8px}
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>Write your short movie review</h1>
+    <p class="small">Follow the structure: Title, 1–2 sentence summary, 1 opinion sentence with a reason, recommendation and star rating.</p>
+
+    <label for="title">Title (or movie name)</label>
+    <input id="title" type="text" placeholder="e.g. Wonder Woman — A short review" />
+
+    <label for="summary">Summary (1–2 sentences)</label>
+    <textarea id="summary" placeholder="Write a short plot summary: what the movie is about and one main event..."></textarea>
+
+    <label for="opinion">Opinion + Reason</label>
+    <textarea id="opinion" placeholder="Write one sentence saying what you think and why: e.g. I think the movie is exciting because..."></textarea>
+
+    <label for="recommend">Recommendation</label>
+    <input id="recommend" type="text" placeholder="e.g. I recommend this movie because..." />
+
+    <div class="meta">
+      <div>
+        <label for="stars">Star rating</label>
+        <select id="stars">
+          <option value="5">★★★★★ (5)</option>
+          <option value="4">★★★★ (4)</option>
+          <option value="3">★★★ (3)</option>
+          <option value="2">★★ (2)</option>
+          <option value="1">★ (1)</option>
+        </select>
+      </div>
+      <div style="margin-left:auto">
+        <label>&nbsp;</label>
+        <div class="small">Characters: <span id="charCount">0</span></div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button id="eval">Evaluate my review</button>
+      <button id="download" class="secondary">Download review (TXT)</button>
+      <button id="clear" class="secondary">Clear</button>
+    </div>
+
+    <div id="feedback" class="feedback" aria-live="polite"></div>
+
+    <div class="card rubric" style="margin-top:14px">
+      <strong>Quick rubric</strong>
+      <ul>
+        <li>Title: present and clear (2 pts)</li>
+        <li>Summary: 1–2 sentences that explain the plot (4 pts)</li>
+        <li>Opinion: clear opinion sentence with a reason (3 pts)</li>
+        <li>Recommendation & rating: present (1 pt)</li>
+      </ul>
+    </div>
+  </main>
+
+  <script>
+    const title = document.getElementById('title');
+    const summary = document.getElementById('summary');
+    const opinion = document.getElementById('opinion');
+    const recommend = document.getElementById('recommend');
+    const stars = document.getElementById('stars');
+    const feedbackEl = document.getElementById('feedback');
+    const charCount = document.getElementById('charCount');
+
+    function updateCharCount(){
+      const total = (title.value + summary.value + opinion.value + recommend.value).length;
+      charCount.textContent = total;
+    }
+
+    [title, summary, opinion, recommend].forEach(el=>el.addEventListener('input', updateCharCount));
+
+    function evaluate(){
+      const textTitle = title.value.trim();
+      const textSummary = summary.value.trim();
+      const textOpinion = opinion.value.trim();
+      const textRecommend = recommend.value.trim();
+      const rating = stars.value;
+
+      let points = 0;
+      const comments = [];
+
+      // Title (2 pts)
+      if(textTitle.length > 0) { points += 2; comments.push('Title: present. (+2)'); }
+      else comments.push('Title: missing. (0)');
+
+      // Summary (4 pts): check sentence count and presence of plot verbs/nouns
+      const sentences = textSummary.split(/[.!?]+/).map(s=>s.trim()).filter(Boolean);
+      const hasPlotKeywords = /movie|film|about|story|she|he|they|is|are|leave|stop|war|lives|lived|prince|princess/i.test(textSummary);
+      if(sentences.length >= 1 && sentences.length <= 2 && hasPlotKeywords){ points += 4; comments.push('Summary: good length and content. (+4)'); }
+      else if(sentences.length > 2 && hasPlotKeywords){ points += 2; comments.push('Summary: too long, try 1–2 sentences. (+2)'); }
+      else { comments.push('Summary: missing or does not describe the plot. (0)'); }
+
+      // Opinion (3 pts): check for opinion markers and because/reason
+      const opinionMarker = /I think|I believe|In my opinion|my favourite|my favorite|I enjoyed|I didn\'t|I did not|I don\'t/i;
+      const reasonMarker = /because|since|as|due to|because of/i;
+      if(opinionMarker.test(textOpinion) || /(strong|beautiful|exciting|boring|great|good|bad|amazing|fun)/i.test(textOpinion)){
+        if(reasonMarker.test(textOpinion)) { points += 3; comments.push('Opinion: clear with a reason. (+3)'); }
+        else { points += 1; comments.push('Opinion: present but add a short reason. (+1)'); }
+      } else { comments.push('Opinion: missing or weak. (0)'); }
+
+      // Recommendation & rating (1 pt)
+      if(textRecommend.length > 0 || parseInt(rating,10) >= 1){ points += 1; comments.push('Recommendation / rating: present. (+1)'); }
+      else comments.push('Recommendation: missing. (0)');
+
+      const percent = Math.round(points / 10 * 100);
+      comments.push('');
+      comments.push('Score: ' + points + '/10 (' + percent + '%)');
+
+      // Construct example improved review if low score
+      if(points < 7){
+        comments.push('');
+        comments.push('Suggestion: Try this simple model:');
+        const model = `${textTitle || 'Movie Title'}\nThe movie is about ... (one or two short sentences).\nI think the movie is ... because ...\nI recommend this movie because ... ${rating}/5`;
+        comments.push(model);
+      }
+
+      feedbackEl.textContent = comments.join('\n');
+    }
+
+    function downloadReview(){
+      const out = [];
+      out.push(title.value || '');
+      out.push('');
+      out.push('Summary: ' + (summary.value || ''));
+      out.push('Opinion: ' + (opinion.value || ''));
+      out.push('Recommendation: ' + (recommend.value || ''));
+      out.push('Rating: ' + stars.value + '/5');
+      const blob = new Blob([out.join('\n')], {type:'text/plain'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = (title.value || 'review') + '.txt';
+      document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    }
+
+    document.getElementById('eval').addEventListener('click', evaluate);
+    document.getElementById('download').addEventListener('click', downloadReview);
+    document.getElementById('clear').addEventListener('click', ()=>{ title.value=''; summary.value=''; opinion.value=''; recommend.value=''; stars.value='5'; updateCharCount(); feedbackEl.textContent=''; });
+
+    // init char count
+    updateCharCount();
+  </script>
+</body>
+</html>
