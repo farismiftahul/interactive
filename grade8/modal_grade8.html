@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Modal Master — Possibility | Certainty | Impossibility</title>
+<style>
+  :root{
+    --bg:#f6f9fb; --panel:#ffffff; --muted:#6b7280;
+    --pos:#7dd3fc; --cert:#86efac; --imp:#fca5a5;
+    --accent:#2563eb; --success:#16a34a; --bad:#dc2626;
+    font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; min-height:100vh; background:
+    linear-gradient(180deg,#e6f0ff 0%, var(--bg) 40%);
+    display:flex; align-items:center; justify-content:center;
+    padding:24px;
+    color:#0f172a;
+  }
+  .app{
+    width:100%; max-width:1100px; background:var(--panel);
+    border-radius:12px; box-shadow:0 8px 30px rgba(16,24,40,.12);
+    padding:20px; display:grid; gap:18px;
+  }
+  header{
+    display:flex; gap:16px; align-items:center; justify-content:space-between;
+  }
+  .title{
+    display:flex; gap:12px; align-items:center;
+  }
+  .logo{
+    width:68px; height:68px; border-radius:10px; background:
+    linear-gradient(135deg,var(--accent),#7c3aed);
+    display:flex; align-items:center; justify-content:center; color:white;
+    font-weight:700; font-size:20px; box-shadow:0 6px 18px rgba(37,99,235,.18);
+  }
+  h1{margin:0; font-size:20px;}
+  p.lead{margin:0; color:var(--muted); font-size:13px}
+  .controls{display:flex; gap:10px; align-items:center}
+  button{background:var(--accent); color:white; border:0; padding:8px 12px; border-radius:8px; cursor:pointer}
+  button.secondary{background:#f3f4f6; color:#0f172a;}
+  .scoreboard{display:flex; gap:10px; align-items:center; color:var(--muted);}
+  .scorebox{background:#fff; border-radius:8px; padding:8px 10px; box-shadow:0 4px 12px rgba(15,23,42,.06); min-width:86px; text-align:center}
+  .scorebox b{display:block; font-size:16px}
+  main{display:grid; grid-template-columns: 360px 1fr; gap:18px;}
+  .left{
+    display:flex; flex-direction:column; gap:12px;
+  }
+  .pool{
+    background:linear-gradient(180deg,#ffffff,#fbfdff);
+    border-radius:10px; padding:12px; min-height:220px; display:flex; flex-wrap:wrap; gap:8px;
+    align-content:flex-start; box-shadow:inset 0 1px 0 rgba(255,255,255,.6);
+  }
+  .sentence{
+    background:linear-gradient(180deg,#f8fafc,#ffffff); padding:10px 12px; border-radius:10px;
+    box-shadow:0 6px 16px rgba(12,18,31,.06); cursor:grab; user-select:none; max-width:100%;
+    font-size:14px; color:#0f172a;
+  }
+  .sentence.dragging{opacity:.6; transform:scale(.98)}
+  .hint{font-size:13px; color:var(--muted)}
+  .bins{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:12px;
+  }
+  .bin{
+    border-radius:10px; padding:12px; min-height:120px; display:flex; flex-direction:column; gap:8px;
+    align-items:flex-start; transition:transform .12s, box-shadow .12s;
+    border:2px dashed rgba(15,23,42,.05); background:linear-gradient(180deg,#fff,#fbfbff);
+  }
+  .bin.pos{border-color:rgba(59,130,246,.18); background:linear-gradient(180deg,#f0f9ff,#ffffff)}
+  .bin.cert{border-color:rgba(34,197,94,.12); background:linear-gradient(180deg,#f0fff4,#ffffff)}
+  .bin.imp{border-color:rgba(244,63,94,.08); background:linear-gradient(180deg,#fff5f6,#ffffff)}
+  .bin h3{margin:0; font-size:15px}
+  .bin .count{font-size:12px; color:var(--muted)}
+  .bin.over{transform:translateY(-6px); box-shadow:0 12px 30px rgba(2,6,23,.12)}
+  .feedback{
+    display:flex; gap:10px; align-items:center; font-size:13px; color:var(--muted);
+  }
+  footer{display:flex; justify-content:space-between; align-items:center; gap:12px}
+  .controls small{display:block; color:var(--muted); font-size:12px; margin-top:6px}
+  .explain{font-size:13px; color:var(--muted); background:#f8fafc; padding:10px; border-radius:8px}
+  .correct{background:linear-gradient(90deg,#ecfccb,#bbf7d0); border-radius:8px; padding:8px; color:var(--success)}
+  .wrong{background:linear-gradient(90deg,#fee2e2,#fecaca); border-radius:8px; padding:8px; color:var(--bad)}
+  /* responsive */
+  @media (max-width:920px){
+    main{grid-template-columns:1fr; }
+    .left{order:2}
+  }
+</style>
+</head>
+<body>
+<div class="app" role="application" aria-labelledby="title">
+  <header>
+    <div class="title">
+      <div class="logo" aria-hidden="true">MM</div>
+      <div>
+        <h1 id="title">Modal Master</h1>
+        <p class="lead">Drag sentences into <strong>Possibility</strong>, <strong>Certainty</strong>, or <strong>Impossibility</strong>.</p>
+      </div>
+    </div>
+    <div class="controls" aria-hidden="false">
+      <div class="scoreboard" aria-live="polite">
+        <div class="scorebox" title="Score"><small>Score</small><b id="score">0</b></div>
+        <div class="scorebox" title="Streak"><small>Streak</small><b id="streak">0</b></div>
+        <div class="scorebox" title="Round"><small>Round</small><b id="round">1</b></div>
+      </div>
+      <button id="newRound" title="Start a new round (shuffles remaining)"><svg height="14" viewBox="0 0 24 24" width="14" style="vertical-align:middle;margin-right:6px" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-3.3-6.6L21 7"/></svg>New</button>
+      <button id="reset" class="secondary" title="Reset score and rounds">Reset</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="left" aria-label="Available sentences">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <strong>Sentences</strong>
+        <small class="hint">Drag them to a bin.</small>
+      </div>
+      <div id="pool" class="pool" aria-label="Pool of sentences" tabindex="0"></div>
+
+      <div style="display:flex;gap:8px; margin-top:6px; align-items:center;">
+        <div class="explain" id="explain" style="flex:1">Place a sentence to see feedback and explanation.</div>
+      </div>
+    </section>
+
+    <section aria-label="Bins and feedback">
+      <div class="bins" role="list">
+        <div class="bin pos" data-type="possibility" id="bin-poss" role="listitem" aria-label="Possibility bin" tabindex="0">
+          <h3>Possibility</h3>
+          <div class="count" id="count-poss">0 items</div>
+        </div>
+
+        <div class="bin cert" data-type="certainty" id="bin-cert" role="listitem" aria-label="Certainty bin" tabindex="0">
+          <h3>Certainty</h3>
+          <div class="count" id="count-cert">0 items</div>
+        </div>
+
+        <div class="bin imp" data-type="impossibility" id="bin-imp" role="listitem" aria-label="Impossibility bin" tabindex="0">
+          <h3>Impossibility</h3>
+          <div class="count" id="count-imp">0 items</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:8px;align-items:center;margin-top:14px">
+        <div id="lastResult" class="feedback" aria-live="polite"></div>
+        <div style="flex:1"></div>
+        <button id="showAnswers" class="secondary" title="Show correct categories for all remaining sentences">Show Answers</button>
+      </div>
+
+      <footer style="margin-top:12px">
+        <small class="hint">Examples: "may/might/could" → Possibility. "must" → Certainty. "can't" → Impossibility.</small>
+        <div style="display:flex;gap:8px">
+          <button id="finish" class="secondary">Finish & Summary</button>
+        </div>
+      </footer>
+    </section>
+  </main>
+</div>
+
+<script>
+/*
+  Modal Master
+  Drag & drop game: classify sentences under Possibility / Certainty / Impossibility.
+  - Scoring: +10 correct, -5 wrong. Streak bonus: +2 per consecutive correct.
+  - Explanation provided from the sentence dataset.
+  - Local storage stores best score in session.
+*/
+
+// Dataset: sentences and target category + explanation
+const SENTENCES = [
+  { text: "We may watch a film this evening.", cat: "possibility", explain: "Uses 'may' to indicate something possible but not certain."},
+  { text: "She might be late.", cat: "possibility", explain: "Uses 'might' to express a possibility."},
+  { text: "He could be at home.", cat: "possibility", explain: "Uses 'could' to show a possible situation."},
+  { text: "You must be quite hungry. You haven't eaten anything for a long time.", cat:"certainty", explain:"'Must' is used when the speaker concludes something is very likely or true based on evidence."},
+  { text: "She must be at the office. I've just talked to her.", cat:"certainty", explain:"'Must' indicates a confident conclusion (evidence: recent conversation)."},
+  { text: "You must be the director of the film. Someone told me the director had a beard like you.", cat:"certainty", explain:"'Must' expresses a strong inference based on information."},
+  { text: "You can't get lost here — you know the area well.", cat:"impossibility", explain:"'Can't' expresses that getting lost is impossible given the knowledge of the area."},
+  { text: "The film we are watching is very boring. You can't be serious when you say you like it.", cat:"impossibility", explain:"'Can't' rejects the possibility of sincerity — used to show impossibility."},
+  { text: "Someone's knocking at the door. He can't be John because he is at the office.", cat:"impossibility", explain:"'Can't' rules out John as the knocker because of evidence he is at the office."},
+  // Extra practice items
+  { text: "It might rain later, so take an umbrella.", cat:"possibility", explain:"'Might' signals that rain is possible but not certain."},
+  { text: "They must have left already — the lights are off.", cat:"certainty", explain:"'Must have' expresses a logical conclusion based on evidence."},
+  { text: "He can't have finished the work already; he started only an hour ago.", cat:"impossibility", explain:"'Can't have' expresses that something is impossible given what is known."},
+  { text: "We could go for a walk if the weather stays nice.", cat:"possibility", explain:"'Could' suggests an option that is possible."},
+  { text: "You must be joking!", cat:"impossibility", explain:"In informal speech 'must be joking' can also be used ironically; here it's treated as a strong rejection (certainty/impossibility intersection)."},
+];
+
+// Game state
+let state = {
+  score: 0,
+  streak: 0,
+  round: 1,
+  pool: [],
+  placed: { possibility:0, certainty:0, impossibility:0 },
+  bestScore: Number(sessionStorage.getItem('mm_best') || 0),
+};
+
+// DOM refs
+const poolEl = document.getElementById('pool');
+const scoreEl = document.getElementById('score');
+const streakEl = document.getElementById('streak');
+const roundEl = document.getElementById('round');
+const explainEl = document.getElementById('explain');
+const lastResult = document.getElementById('lastResult');
+const counts = {
+  possibility: document.getElementById('count-poss'),
+  certainty: document.getElementById('count-cert'),
+  impossibility: document.getElementById('count-imp'),
+};
+
+// Utility: shuffle an array (Fisher-Yates)
+function shuffle(a){
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+// Initialize a new round (shuffle and display 6-9 sentences)
+function startRound(fullReset=false){
+  if(fullReset){
+    state.score=0; state.streak=0; state.round=1;
+    state.placed = { possibility:0, certainty:0, impossibility:0 }
+  }
+  // choose random subset for variety
+  const poolSize = Math.min(9, SENTENCES.length);
+  const shuffled = shuffle([...SENTENCES]);
+  state.pool = shuffled.slice(0, poolSize).map((s, idx)=>({ ...s, id: 's' + idx + '-' + Date.now() }));
+  renderPool();
+  updateUI();
+  explainEl.textContent = "Place a sentence to see feedback and explanation.";
+  lastResult.innerHTML = "";
+  state.round = state.round || 1;
+  roundEl.textContent = state.round;
+}
+
+// Render pool sentences
+function renderPool(){
+  poolEl.innerHTML = '';
+  for(const item of state.pool){
+    const d = document.createElement('div');
+    d.className = 'sentence';
+    d.draggable = true;
+    d.id = item.id;
+    d.tabIndex = 0;
+    d.setAttribute('data-cat', item.cat);
+    d.textContent = item.text;
+    poolEl.appendChild(d);
+
+    // drag events
+    d.addEventListener('dragstart', dragStart);
+    d.addEventListener('dragend', dragEnd);
+
+    // keyboard accessibility: press Enter to open a chooser for bins
+    d.addEventListener('keydown', (e)=>{
+      if(e.key === 'Enter' || e.key === ' '){
+        e.preventDefault();
+        openKeyboardChooser(item);
+      }
+    });
+  }
+}
+
+// Drag handlers
+let dragged = null;
+function dragStart(e){
+  dragged = e.target;
+  e.dataTransfer.setData('text/plain', e.target.id);
+  setTimeout(()=> e.target.classList.add('dragging'), 10);
+}
+function dragEnd(e){
+  if(e.target) e.target.classList.remove('dragging');
+  dragged = null;
+}
+
+// Bins dragover/drop
+const bins = document.querySelectorAll('.bin');
+bins.forEach(bin=>{
+  bin.addEventListener('dragover', (e)=>{ e.preventDefault(); bin.classList.add('over'); });
+  bin.addEventListener('dragleave', ()=> bin.classList.remove('over'));
+  bin.addEventListener('drop', (e)=>{
+    e.preventDefault(); bin.classList.remove('over');
+    const id = e.dataTransfer.getData('text/plain');
+    if(!id) return;
+    const el = document.getElementById(id);
+    if(!el) return;
+    handlePlacement(el, bin.dataset.type);
+  });
+  // allow keyboard focus drop: press Enter while bin focused to attempt placement from last selected
+  bin.addEventListener('keydown', (e)=>{
+    if((e.key === 'Enter' || e.key === ' ') && lastKeyboardSelected){
+      e.preventDefault();
+      handlePlacement(document.getElementById(lastKeyboardSelected.id), bin.dataset.type);
+    }
+  });
+});
+
+// Keyboard chooser support
+let lastKeyboardSelected = null;
+function openKeyboardChooser(item){
+  lastKeyboardSelected = item;
+  // visually hint user
+  explainEl.textContent = `Selected sentence for keyboard placement: "${item.text}". Now focus a bin and press Enter to place it.`;
+  document.querySelectorAll('.bin').forEach(b=>b.focus());
+}
+
+// Placement evaluation
+function handlePlacement(el, binType){
+  if(!el) return;
+  const correct = el.getAttribute('data-cat') === binType;
+  // Remove from pool visually and state
+  el.parentNode.removeChild(el);
+  state.pool = state.pool.filter(p => p.id !== el.id);
+
+  // update placed counts
+  if(binType === 'possibility') state.placed.possibility++;
+  if(binType === 'certainty') state.placed.certainty++;
+  if(binType === 'impossibility') state.placed.impossibility++;
+
+  // scoring
+  if(correct){
+    const base = 10;
+    state.streak += 1;
+    const streakBonus = Math.min(10, state.streak * 2);
+    state.score += base + streakBonus;
+    showResult(true, el.textContent, getSentenceById(el.id).explain, binType);
+  } else {
+    state.streak = 0;
+    state.score -= 5;
+    if(state.score < 0) state.score = 0;
+    const actual = getSentenceById(el.id).cat;
+    showResult(false, el.textContent, getSentenceById(el.id).explain + ` (Correct category: ${actual})`, binType);
+  }
+
+  updateUI();
+
+  // if pool empty -> advance round
+  if(state.pool.length === 0){
+    setTimeout(()=> {
+      state.round += 1;
+      roundEl.textContent = state.round;
+      // small animation & start new round
+      explainEl.textContent = "Round complete! New sentences incoming.";
+      startRound(false);
+    }, 800);
+  }
+}
+
+// helper to find sentence by generated id
+function getSentenceById(id){
+  // we used slice of SENTENCES and added id — but when pool changes we still have the dataset in state. placed ones may be gone, so track by text matching fallback
+  return (SENTENCES.concat(state.pool)).find(s => s.id === id) || state.pool.find(p => p.id === id) || SENTENCES.find(s => s.text === document.getElementById(id)?.textContent) || {cat:'unknown', explain:''};
+}
+
+// Result feedback
+function showResult(isCorrect, sentenceText, explanation, placedBin){
+  lastResult.innerHTML = '';
+  const box = document.createElement('div');
+  box.className = isCorrect ? 'correct' : 'wrong';
+  box.innerHTML = `<strong>${isCorrect ? 'Correct!' : 'Not quite'}</strong> — <span style="display:block;margin-top:6px;font-weight:600">${sentenceText}</span>
+    <div style="margin-top:6px;font-size:13px;color:var(--muted)">${explanation}</div>`;
+  lastResult.appendChild(box);
+  explainEl.textContent = explanation;
+  // update best score storage
+  if(state.score > state.bestScore){
+    state.bestScore = state.score;
+    sessionStorage.setItem('mm_best', state.bestScore);
+  }
+}
+
+// update UI elements
+function updateUI(){
+  scoreEl.textContent = state.score;
+  streakEl.textContent = state.streak;
+  roundEl.textContent = state.round;
+  counts.possibility.textContent = state.placed.possibility + ' items';
+  counts.certainty.textContent = state.placed.certainty + ' items';
+  counts.impossibility.textContent = state.placed.impossibility + ' items';
+
+  // repopulate pool if needed (renderPool keeps items interactive)
+  if(state.pool.length === 0){
+    poolEl.innerHTML = '<div style="color:var(--muted)">All placed — starting a new round shortly...</div>';
+  }
+
+  // Accessibility: update aria
+  poolEl.setAttribute('aria-label', `Pool with ${state.pool.length} sentences remaining`);
+}
+
+// Buttons
+document.getElementById('newRound').addEventListener('click', ()=>{
+  state.round += 1;
+  startRound(false);
+});
+document.getElementById('reset').addEventListener('click', ()=>{
+  if(!confirm('Reset score, streak and rounds?')) return;
+  state = { score:0, streak:0, round:1, pool:[], placed: {possibility:0, certainty:0, impossibility:0}, bestScore:0 };
+  sessionStorage.setItem('mm_best', 0);
+  startRound(true);
+});
+document.getElementById('showAnswers').addEventListener('click', ()=>{
+  if(state.pool.length === 0) { alert('No sentences remaining this round.'); return; }
+  // Show all remaining with their correct category
+  const list = state.pool.map(s => `• "${s.text}" → ${s.cat}`).join('\\n');
+  alert('Correct categories for remaining sentences:\\n\\n' + list);
+});
+document.getElementById('finish').addEventListener('click', ()=>{
+  const summary = [
+    `Rounds completed: ${state.round}`,
+    `Score: ${state.score}`,
+    `Best (this session): ${state.bestScore}`,
+    `Streak: ${state.streak}`,
+    `Placed: Possibility ${state.placed.possibility}, Certainty ${state.placed.certainty}, Impossibility ${state.placed.impossibility}`
+  ].join('\\n');
+  alert('Session Summary:\\n\\n' + summary);
+});
+
+// Touch support — allow long-press to pick up and drop to bin
+let touchPicked = null;
+poolEl.addEventListener('touchstart', (e)=>{
+  const t = e.target.closest('.sentence');
+  if(!t) return;
+  touchPicked = t;
+  t.classList.add('dragging');
+});
+poolEl.addEventListener('touchend', (e)=>{
+  if(!touchPicked) return;
+  touchPicked.classList.remove('dragging');
+  touchPicked = null;
+});
+// bins accept click/tap placement for touch users — show a modal choice
+bins.forEach(bin=>{
+  bin.addEventListener('click', ()=>{
+    // if a sentence element is selected (clicked) place it
+    const sel = document.activeElement;
+    if(sel && sel.classList.contains('sentence')){
+      handlePlacement(sel, bin.dataset.type);
+    }
+  });
+});
+
+// initialize
+startRound(true);
+
+// small keyboard hint: allow arrow keys to move focus between bins
+document.addEventListener('keydown', (e)=>{
+  if((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && document.activeElement.classList.contains('bin')){
+    e.preventDefault();
+    const binArray = Array.from(document.querySelectorAll('.bin'));
+    const idx = binArray.indexOf(document.activeElement);
+    const next = e.key === 'ArrowRight' ? binArray[(idx+1)%binArray.length] : binArray[(idx-1+binArray.length)%binArray.length];
+    next.focus();
+  }
+});
+</script>
+</body>
+</html>
