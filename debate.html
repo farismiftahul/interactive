@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Asian Parliamentary Debate — Classroom Game</title>
+  <style>
+    :root{ --bg:#0f1724; --card:#0b1220; --accent:#ffb86b; --muted:#94a3b8; --glass: rgba(255,255,255,0.04); --good:#7ee787; --bad:#ff7b7b; --glass-2: rgba(255,255,255,0.02);} 
+    *{box-sizing:border-box}
+    body{font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,Helvetica,Arial; margin:0; background:linear-gradient(135deg,#071027 0%, #07243a 50%, #08121a 100%); color:#e6eef8}
+    .wrap{max-width:1100px;margin:28px auto;padding:20px}
+    header{display:flex;align-items:center;gap:18px}
+    h1{margin:0;font-size:20px;letter-spacing:0.6px}
+    p.lead{margin:6px 0 18px;color:var(--muted)}
+    .grid{display:grid;grid-template-columns:1fr 420px;gap:18px}
+    .card{background:linear-gradient(180deg,var(--card), #061020);border-radius:14px;padding:16px;box-shadow:0 6px 30px rgba(2,6,23,0.6);}
+    .controls{display:flex;flex-direction:column;gap:10px}
+    label{font-size:13px;color:var(--muted)}
+    input[type=text], textarea, select, input[type=number]{width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--glass);background:transparent;color:inherit}
+    textarea{min-height:80px;resize:vertical}
+    .row{display:flex;gap:8px}
+    button{background:linear-gradient(180deg,var(--accent), #ff9e49);border:none;padding:10px 12px;border-radius:10px;font-weight:600;cursor:pointer;box-shadow:0 6px 14px rgba(255,148,60,0.18)}
+    button.ghost{background:transparent;border:1px solid var(--glass);color:var(--muted);box-shadow:none}
+    .teams{display:flex;gap:10px}
+    .teamcard{flex:1;padding:12px;border-radius:10px;background:var(--glass-2)}
+    .teamcard h3{margin:0 0 8px;font-size:14px}
+    .names{font-size:14px;line-height:1.5;min-height:42px}
+    .motionBox{padding:12px;border-radius:10px;background:linear-gradient(90deg,#031428, #051824); border:1px solid rgba(255,255,255,0.02)}
+    .motion{font-weight:700;font-size:18px}
+    .tiny{font-size:12px;color:var(--muted)}
+    .timerBig{font-family:Inter,monospace;color:var(--accent);font-size:26px;font-weight:800}
+    .speakerList{display:flex;flex-direction:column;gap:8px}
+    .speaker{display:flex;justify-content:space-between;align-items:center;padding:8px;border-radius:8px;background:var(--glass)}
+    .speaker strong{font-size:14px}
+    .poiBtn{background:transparent;border:1px dashed var(--accent);padding:6px 10px;border-radius:8px;color:var(--accent);cursor:pointer}
+    .settings{display:flex;gap:8px;flex-wrap:wrap}
+    footer{margin-top:18px;color:var(--muted);font-size:13px}
+    .confetti{pointer-events:none;position:fixed;right:20px;bottom:20px;width:140px}
+    .controlsRow{display:flex;gap:8px}
+    .status{font-size:13px;color:var(--muted)}
+    .small{font-size:11px;color:var(--muted)}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>Asian Parliamentary Debate — Classroom Game</h1>
+        <p class="lead">Random motions, random teams, and built-in timers for prep, speeches and Points of Information (POIs). Now supports custom motions and records how long each student actually speaks.</p>
+      </div>
+    </header>
+
+    <div class="grid">
+      <div class="card">
+        <div class="controls">
+          <label>1) Add student names (comma or newline separated)</label>
+          <textarea id="namesInput" placeholder="e.g. Alice, Bob, Chen, Dae, Emi"></textarea>
+          <div class="row">
+            <button id="assignBtn">Assign Teams Randomly</button>
+            <button id="clearBtn" class="ghost">Clear</button>
+          </div>
+
+          <label style="margin-top:8px">2) Motion</label>
+          <div class="motionBox">
+            <div class="motion" id="motionText">Click "Generate Motion" to create a motion.</div>
+            <div class="tiny" style="margin-top:8px">There are 25 funny & easy-but-critical motions built in. You may also add your own custom motions below — they will be mixed into the random pool.</div>
+          </div>
+          <div class="row" style="margin-top:10px">
+            <button id="genMotion">Generate Motion</button>
+            <button id="shuffleMotion" class="ghost">Shuffle & Lock</button>
+          </div>
+
+          <label style="margin-top:12px">Add custom motions (one per line or comma-separated)</label>
+          <textarea id="customMotionsInput" placeholder="Type / paste motions here...
+This House would...
+This House believes..."></textarea>
+          <div class="row">
+            <button id="addCustom">Add to Motion Pool</button>
+            <button id="clearCustom" class="ghost">Clear Custom</button>
+          </div>
+          <div class="small" id="customCount">Custom motions in pool: 0</div>
+
+          <label style="margin-top:12px">3) Timers & Settings</label>
+          <div class="settings">
+            <div>
+              <div class="tiny">Prep time (minutes)</div>
+              <input type="number" id="prepMin" value="30" min="1">
+            </div>
+            <div>
+              <div class="tiny">Speaker time (minutes)</div>
+              <input type="number" id="speakerMin" value="7" min="1">
+            </div>
+            <div>
+              <div class="tiny">Enable POIs</div>
+              <select id="poiEnable"><option value="yes">Yes</option><option value="no">No</option></select>
+            </div>
+            <div>
+              <div class="tiny">POI duration (seconds)</div>
+              <input type="number" id="poiSec" value="15" min="3">
+            </div>
+          </div>
+
+          <div class="row" style="margin-top:10px">
+            <button id="startPrep">Start Prep Timer</button>
+            <button id="stopAll" class="ghost">Stop All</button>
+          </div>
+
+          <div style="margin-top:10px">
+            <div class="tiny">Current Timer</div>
+            <div class="timerBig" id="mainTimer">00:00</div>
+            <div class="status" id="timerStatus">Idle</div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <h2 style="margin:0;font-size:16px">Teams & Speakers</h2>
+          <div class="tiny">Auto-splits into two teams: Government & Opposition</div>
+        </div>
+
+        <div class="teams" style="margin-top:12px">
+          <div class="teamcard">
+            <h3>Government</h3>
+            <div id="govNames" class="names">—</div>
+          </div>
+          <div class="teamcard">
+            <h3>Opposition</h3>
+            <div id="oppNames" class="names">—</div>
+          </div>
+        </div>
+
+        <hr style="border:none;height:1px;background:rgba(255,255,255,0.03);margin:12px 0">
+
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div><strong>Speaker control</strong><div class="tiny">Click "Next Speaker" to begin each speech</div></div>
+            <div class="tiny">Speaker time is configurable above</div>
+          </div>
+
+          <div style="margin-top:10px" class="speakerList" id="speakerList">
+            <!-- speakers inserted here -->
+          </div>
+
+          <div style="margin-top:10px;display:flex;gap:8px">
+            <button id="nextSpeaker">Next Speaker</button>
+            <button id="pauseSpeaker" class="ghost">Pause</button>
+            <button id="resetSpeaker" class="ghost">Reset</button>
+            <button id="poiManual" class="poiBtn">Trigger POI</button>
+          </div>
+
+          <div style="margin-top:12px">
+            <div class="tiny">POI Panel</div>
+            <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
+              <div class="tiny">POIs made: <strong id="poiCount">0</strong></div>
+              <div class="tiny">Current POI timer: <strong id="poiTimerDisplay">00</strong>s</div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <footer>
+      Tip: Enter names, press "Assign Teams Randomly" and then generate a motion. Use the prep timer for case building, then step through speakers with "Next Speaker". POIs will pause the speaker timer and start a short POI clock. The speaker panel now records how many minutes and seconds each student actually spoke across the session.
+    </footer>
+  </div>
+
+  <script>
+    // 25 funny & easy but critical motions
+    const defaultMotions = [
+      "This House believes smartphones do more harm than good in school.",
+      "This House would require homework to include at least one creative task.",
+      "This House believes school uniforms should be replaced by pajamas.",
+      "This House would ban the word 'literally' from school speeches.",
+      "This House believes exams should be replaced by project portfolios.",
+      "This House would give every student a weekly nap hour.",
+      "This House would make pizza a mandatory school lunch once a week.",
+      "This House believes teachers should have to pass the final exams they give.",
+      "This House would let students grade one assignment each week.",
+      "This House believes TikTok is an effective educational tool.",
+      "This House would allow debates as a grading option in all subjects.",
+      "This House believes schools should teach social media manners as a subject.",
+      "This House would replace detention with community service in the playground.",
+      "This House believes smartphones should be given to students at age 12.",
+      "This House would have a 'Bring Your Pet to School' day every term.",
+      "This House believes school assemblies should be student-led only.",
+      "This House would make one subject optional each term to reduce stress.",
+      "This House believes every class should start with a two-minute meditation.",
+      "This House would allow students to choose their homework deadlines.",
+      "This House believes teachers should wear costumes on test days.",
+      "This House would give bonus marks for the best classroom prank (harmless).",
+      "This House believes all group projects must have a designated 'fun officer'.",
+      "This House would replace one exam question with a creative drawing task.",
+      "This House believes the principal should take a student-led lesson once a year.",
+      "This House would require every student to deliver one persuasive speech per term."
+    ];
+
+    let motions = [...defaultMotions];
+    let customMotions = [];
+
+    // UI elements
+    const namesInput = document.getElementById('namesInput');
+    const assignBtn = document.getElementById('assignBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const govNames = document.getElementById('govNames');
+    const oppNames = document.getElementById('oppNames');
+    const genMotion = document.getElementById('genMotion');
+    const motionText = document.getElementById('motionText');
+    const speakerList = document.getElementById('speakerList');
+    const prepMin = document.getElementById('prepMin');
+    const speakerMin = document.getElementById('speakerMin');
+    const startPrep = document.getElementById('startPrep');
+    const mainTimer = document.getElementById('mainTimer');
+    const timerStatus = document.getElementById('timerStatus');
+    const stopAll = document.getElementById('stopAll');
+    const nextSpeaker = document.getElementById('nextSpeaker');
+    const pauseSpeaker = document.getElementById('pauseSpeaker');
+    const resetSpeaker = document.getElementById('resetSpeaker');
+    const poiManual = document.getElementById('poiManual');
+    const poiEnable = document.getElementById('poiEnable');
+    const poiSec = document.getElementById('poiSec');
+    const poiCount = document.getElementById('poiCount');
+    const poiTimerDisplay = document.getElementById('poiTimerDisplay');
+    const shuffleMotion = document.getElementById('shuffleMotion');
+    const customInput = document.getElementById('customMotionsInput');
+    const addCustom = document.getElementById('addCustom');
+    const clearCustom = document.getElementById('clearCustom');
+    const customCount = document.getElementById('customCount');
+
+    let currentMotion = null;
+    let gov = [], opp = [];
+    let speakers = []; // array of {name, team, role, totalSeconds, currentStart}
+    let speakerIndex = -1;
+
+    // timers
+    let mainInterval = null;
+    let mainRemaining = 0; // seconds
+    let mainMode = 'idle';
+
+    let poiInterval = null;
+    let poiRemaining = 0;
+    let currentPoiCount = 0;
+
+    function formatTime(s){
+      const m = Math.floor(s/60).toString().padStart(2,'0');
+      const sec = Math.floor(s%60).toString().padStart(2,'0');
+      return `${m}:${sec}`;
+    }
+
+    function pickMotion(){
+      if(motions.length===0){ motionText.textContent='No motions available.'; return; }
+      const idx = Math.floor(Math.random()*motions.length);
+      currentMotion = motions[idx];
+      motionText.textContent = currentMotion;
+    }
+
+    genMotion.addEventListener('click', ()=>{ pickMotion(); });
+    shuffleMotion.addEventListener('click', ()=>{ pickMotion(); shuffleMotion.textContent='Motion Locked ✓'; setTimeout(()=> shuffleMotion.textContent='Shuffle & Lock',1500); });
+
+    addCustom.addEventListener('click', ()=>{
+      const raw = customInput.value.trim();
+      if(!raw){ alert('Enter at least one custom motion.'); return; }
+      const parts = raw.split(/[,
+]+/).map(s=>s.trim()).filter(Boolean);
+      customMotions.push(...parts);
+      motions.push(...parts);
+      customInput.value='';
+      customCount.textContent = `Custom motions in pool: ${customMotions.length}`;
+      alert(parts.length + ' custom motion(s) added to the pool.');
+    });
+    clearCustom.addEventListener('click', ()=>{ // remove custom from motions
+      motions = motions.filter(m => !customMotions.includes(m)); customMotions = []; customCount.textContent='Custom motions in pool: 0'; alert('All custom motions removed from pool.'); });
+
+    clearBtn.addEventListener('click', ()=>{ namesInput.value=''; gov=[]; opp=[]; renderTeams(); buildSpeakersFromTeams(); });
+
+    assignBtn.addEventListener('click', ()=>{
+      const raw = namesInput.value.trim();
+      if(!raw){ alert('Please enter student names first.'); return; }
+      let names = raw.split(/[,
+]+/).map(s=>s.trim()).filter(Boolean);
+      // shuffle
+      for(let i=names.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [names[i],names[j]]=[names[j],names[i]] }
+      // split into two teams evenly
+      gov=[]; opp=[];
+      for(let i=0;i<names.length;i++){ if(i%2===0) gov.push(names[i]); else opp.push(names[i]); }
+      renderTeams(); buildSpeakersFromTeams();
+    });
+
+    function renderTeams(){ govNames.textContent = gov.length? gov.join('
+') : '—'; oppNames.textContent = opp.length? opp.join('
+') : '—'; }
+
+    function buildSpeakersFromTeams(){
+      // Create speaker slots up to 3 per side, adapt for fewer players.
+      speakers = [];
+      const govRoles = ['Prime Minister','Deputy PM','Government Whip'];
+      const oppRoles = ['Leader of Opposition','Deputy Leader','Opposition Whip'];
+
+      for(let i=0;i<3;i++){ if(gov[i]) speakers.push({name:gov[i],team:'Gov',role:govRoles[i], totalSeconds:0, currentStart:null}); }
+      for(let i=0;i<3;i++){ if(opp[i]) speakers.push({name:opp[i],team:'Opp',role:oppRoles[i], totalSeconds:0, currentStart:null}); }
+      speakerIndex = -1; renderSpeakers();
+    }
+
+    function renderSpeakers(){ speakerList.innerHTML=''; if(speakers.length===0){ speakerList.innerHTML='<div class="tiny">No speakers assigned yet.</div>'; return; }
+      speakers.forEach((s, idx)=>{
+        const el = document.createElement('div'); el.className='speaker';
+        const total = formatTime(s.totalSeconds + (s.currentStart? (Date.now()-s.currentStart)/1000 : 0));
+        el.innerHTML = `<div><strong>${s.name}</strong><div class="tiny">${s.role} — ${s.team}</div></div><div id="spTime${idx}" class="tiny">${idx===speakerIndex? 'Speaking — ' + (mainInterval? formatTime(mainRemaining) : '00:00') : 'Total spoken: ' + total}</div>`;
+        speakerList.appendChild(el);
+      }); }
+
+    // PREP timer
+    startPrep.addEventListener('click', ()=>{ const mins = parseInt(prepMin.value) || 0; if(mins<=0){ alert('Set a positive prep time.'); return; } startMainTimer(mins*60, 'Prep: Case building'); });
+    stopAll.addEventListener('click', ()=>{ stopMainTimer(); stopPoiTimer(); accumulateSpeakerTime(); timerStatus.textContent='Stopped'; });
+
+    function startMainTimer(seconds, modeLabel){ stopMainTimer(); mainRemaining = seconds; mainMode='running'; mainTimer.textContent=formatTime(mainRemaining); timerStatus.textContent = modeLabel || 'Running'; mainInterval = setInterval(()=>{ mainRemaining--; if(mainRemaining<0){ // timer finished
+          // accumulate speaker time if a speaker was speaking
+          accumulateSpeakerTime(); stopMainTimer(); timerStatus.textContent='Done'; beep(); return; }
+        mainTimer.textContent = formatTime(mainRemaining); },1000); }
+    function stopMainTimer(){ if(mainInterval) clearInterval(mainInterval); mainInterval=null; }
+
+    // Speaker controls
+    nextSpeaker.addEventListener('click', ()=>{
+      if(speakers.length===0){ alert('Assign teams / speakers first.'); return; }
+      // stop and accumulate current speaker time
+      accumulateSpeakerTime();
+      // advance index
+      speakerIndex = (speakerIndex + 1) % speakers.length;
+      startSpeaker(speakerIndex);
+    });
+
+    pauseSpeaker.addEventListener('click', ()=>{ if(mainMode==='speaker-paused'){ resumeSpeaker(); } else { pauseSpeakerTimer(); } });
+    resetSpeaker.addEventListener('click', ()=>{ stopMainTimer(); stopPoiTimer(); accumulateSpeakerTime(); speakerIndex=-1; updateSpeakerDisplays(); mainTimer.textContent='00:00'; timerStatus.textContent='Idle'; });
+
+    function startSpeaker(idx){
+      const mins = parseInt(speakerMin.value) || 1;
+      currentPoiCount = 0; poiCount.textContent = currentPoiCount;
+      // set speaker remaining time
+      startMainTimer(mins*60, `Speaker: ${speakers[idx].name} (${speakers[idx].role})`);
+      // start recording speaking time
+      speakers[idx].currentStart = Date.now();
+      updateSpeakerDisplays();
+    }
+
+    function accumulateSpeakerTime(){
+      if(speakerIndex>=0 && speakers[speakerIndex]){
+        const s = speakers[speakerIndex];
+        if(s.currentStart){ const elapsed = (Date.now() - s.currentStart)/1000; s.totalSeconds += elapsed; s.currentStart = null; }
+      }
+      updateSpeakerDisplays();
+    }
+
+    function updateSpeakerDisplays(){ speakers.forEach((s, idx)=>{
+        const el = document.getElementById('spTime'+idx);
+        if(!el) return;
+        const runningExtra = s.currentStart ? (Date.now()-s.currentStart)/1000 : 0;
+        const totalDisplay = formatTime(s.totalSeconds + runningExtra);
+        if(idx===speakerIndex) el.textContent = (mainInterval? 'Speaking — ' + formatTime(mainRemaining) : 'Speaking — ' + totalDisplay);
+        else el.textContent = 'Total spoken: ' + totalDisplay;
+      }); }
+
+    // keep updating speaker display every 600ms so total spoken updates live
+    setInterval(()=>{ if(speakers.length>0) updateSpeakerDisplays(); }, 600);
+
+    function pauseSpeakerTimer(){ if(mainInterval){ clearInterval(mainInterval); mainInterval=null; mainMode='speaker-paused'; timerStatus.textContent='Paused'; pauseSpeaker.textContent='Resume'; // accumulate spoken time up to pause
+        if(speakerIndex>=0) accumulateSpeakerTime(); } }
+    function resumeSpeaker(){ if(mainRemaining>0){ mainMode='running'; timerStatus.textContent='Resumed'; pauseSpeaker.textContent='Pause'; // resume recording
+        if(speakerIndex>=0 && speakers[speakerIndex]) speakers[speakerIndex].currentStart = Date.now(); mainInterval = setInterval(()=>{ mainRemaining--; if(mainRemaining<0){ accumulateSpeakerTime(); stopMainTimer(); timerStatus.textContent='Done'; beep(); return; } mainTimer.textContent=formatTime(mainRemaining); },1000); } }
+
+    // POI handling: when triggered, pause speaker and start POI countdown
+    poiManual.addEventListener('click', ()=>{ triggerPOI(); });
+
+    function triggerPOI(){ if(poiEnable.value==='no'){ alert('POIs are disabled in settings.'); return; }
+      // pause speaker: accumulate spoken time up to POI
+      if(mainInterval){ clearInterval(mainInterval); mainInterval=null; }
+      if(speakerIndex>=0) accumulateSpeakerTime();
+      poiRemaining = parseInt(poiSec.value) || 10; poiTimerDisplay.textContent = poiRemaining;
+      poiInterval = setInterval(()=>{ poiRemaining--; poiTimerDisplay.textContent = poiRemaining; if(poiRemaining<=0){ stopPoiTimer(); currentPoiCount++; poiCount.textContent = currentPoiCount; // resume speaker
+            if(mainRemaining>0){ // resume speaker timing
+              if(speakerIndex>=0 && speakers[speakerIndex]) speakers[speakerIndex].currentStart = Date.now(); resumeMainIntervalAfterPoi(); }
+          } },1000);
+    }
+    function resumeMainIntervalAfterPoi(){ if(mainRemaining>0){ mainInterval = setInterval(()=>{ mainRemaining--; if(mainRemaining<0){ accumulateSpeakerTime(); stopMainTimer(); timerStatus.textContent='Done'; beep(); return; } mainTimer.textContent=formatTime(mainRemaining); },1000); timerStatus.textContent = `Speaker: ${speakers[speakerIndex].name} (${speakers[speakerIndex].role})`; } }
+    function stopPoiTimer(){ if(poiInterval) clearInterval(poiInterval); poiInterval=null; poiTimerDisplay.textContent='00'; }
+
+    function beep(){ try{ const ctx = new (window.AudioContext || window.webkitAudioContext)(); const o = ctx.createOscillator(); const g = ctx.createGain(); o.type='sine'; o.frequency.value=880; g.gain.value=0.06; o.connect(g); g.connect(ctx.destination); o.start(); setTimeout(()=>{ o.stop(); ctx.close(); }, 280); }catch(e){ console.log('beep failed', e); } }
+
+    // Shortcut: space to trigger nextSpeaker when input not focused
+    document.addEventListener('keydown', (e)=>{ const inFocus = document.activeElement && (document.activeElement.tagName==='INPUT' || document.activeElement.tagName==='TEXTAREA' || document.activeElement.isContentEditable); if(inFocus) return; if(e.code==='Space') { e.preventDefault(); nextSpeaker.click(); } });
+
+    // initial
+    pickMotion();
+
+  </script>
+</body>
+</html>
