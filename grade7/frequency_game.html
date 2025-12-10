@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Frequency Wheel Game — Fixed</title>
+<style>
+  body{font-family:Arial,Helvetica,sans-serif;background:#eef2f6;padding:20px}
+  #gameBox{max-width:820px;margin:20px auto;background:#fff;padding:18px;border-radius:10px;box-shadow:0 6px 24px rgba(5,10,25,0.08)}
+  #wheelContainer{position:relative;width:360px;margin:0 auto}
+  #arrow{position:absolute;right:-36px;top:50%;transform:translateY(-50%);z-index:20}
+  canvas{display:block;border-radius:50%;background:#fff;border:6px solid #444}
+  #spinBtn{display:block;margin:10px auto;padding:12px 22px;background:#2563eb;color:#fff;border:0;border-radius:8px;cursor:pointer;font-size:16px}
+  #question{margin-top:18px;font-size:18px}
+  .choice{background:#eef2ff;border:1px solid #d6e4ff;padding:10px;border-radius:8px;margin:8px 0;cursor:pointer}
+  #rewardMsg{margin-top:12px;font-weight:600}
+  .hidden{display:none}
+</style>
+</head>
+<body>
+<div id="gameBox">
+  <h2>Frequency Wheel</h2>
+  <p>Grade 7.</p>
+
+  <div id="wheelContainer">
+    <!-- right-pointing arrow -->
+    <svg id="arrow" width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Reverse arrow: now pointing LEFT toward the wheel -->
+  <path d="M22 12H4" stroke="#d00000" stroke-width="3" stroke-linecap="round" />
+  <path d="M10 6L4 12L10 18" stroke="#d00000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+</svg>
+
+    <canvas id="wheel" width="320" height="320" aria-label="reward wheel"></canvas>
+    <button id="spinBtn">SPIN</button>
+  </div>
+
+  <div id="question"></div>
+  <div id="choices"></div>
+  <div id="rewardMsg"></div>
+</div>
+
+<script>
+(function(){
+  // Defensive wrapper to surface errors to the user (console + on-screen)
+  function showFatal(err){
+    console.error(err);
+    const el=document.getElementById('rewardMsg');
+    el.innerText='Runtime error: '+String(err);
+  }
+
+  try{
+    // ------------------ Question banks ------------------
+    const easyQ = [
+      {type:'mc',q:'I ____ wake up at 6 a.m. (every day)',a:['never','always','rarely'],c:'always'},
+      {type:'mc',q:'She ____ takes a shower before school. (most days)',a:['never','usually','rarely'],c:'usually'}
+    ];
+
+    const medQ = [
+      {type:'mc',q:'They practise English 3 times a week. They ____ practise.',a:['never','sometimes','always'],c:'sometimes'},
+      {type:'mc',q:'I exercise 6 days a week. I ____ exercise.',a:['rarely','never','usually'],c:'usually'}
+    ];
+
+    // HARD: formats A-F (each item has type field for renderer)
+    const hardQ = [
+  // A) Insert the adverb in the correct place
+  {type:'insert', q:'Insert the adverb in the correct place. Sentence: He goes to the gym. Adverb: rarely', options:['He rarely goes to the gym.','He goes rarely to the gym.','Rarely he goes to the gym.'], c:'He rarely goes to the gym.'},
+
+  // B) Form a sentence using the given words
+  {type:'form', q:'Form a sentence using the words: always / she / breakfast / eats / at home', options:['She always eats breakfast at home.','Always she eats breakfast at home.','She eats breakfast always at home.'], c:'She always eats breakfast at home.'},
+
+  // C) Rewrite the sentence with an adverb
+  {type:'rewrite', q:'Rewrite using one adverb: She is late maybe once every few months.', options:['She is rarely late.','She is sometimes late.','She is usually late.'], c:'She is rarely late.'},
+
+  // D) Correct the incorrect sentence
+  {type:'correct', q:'Correct the sentence: He goes always to school by bus.', options:['He always goes to school by bus.','He goes to school always by bus.','Always he goes to school by bus.'], c:'He always goes to school by bus.'},
+
+  // E) Choose correct placement out of 3
+  {type:'placement', q:'Where should “often” go?', options:['She often goes to school.','She goes often to school.','She goes to often school.'], c:'She often goes to school.'},
+
+  // F) Build a sentence from context
+  {type:'context', q:'Context: He goes to the gym 1–2 times a month. Choose the correct sentence.', options:['He seldom goes to the gym.','He often goes to the gym.','He usually goes to the gym.'], c:'He seldom goes to the gym.'}
+];
+
+    // Utility to pick and render
+    function randomFrom(arr){return arr[Math.floor(Math.random()*arr.length)];}
+
+    // ------------------ Wheel setup ------------------
+    const wheel = document.getElementById('wheel');
+    const ctx = wheel.getContext('2d');
+    const center = {x:wheel.width/2,y:wheel.height/2};
+
+    const slices = [
+      {label:'DIFFICULT',color:'#e63946'},
+      {label:'MEDIUM',color:'#ffbe0b'},
+      {label:'EASY',color:'#2a9d8f'}
+    ];
+
+    let angle = 0;     // current rotation angle in radians
+    let spinning = false;
+
+    function clear(){ ctx.clearRect(0,0,wheel.width,wheel.height); }
+
+    function drawWheel(){
+      clear();
+      const r = Math.min(wheel.width,wheel.height)/2;
+      const sliceAngle = 2*Math.PI/slices.length;
+
+      for(let i=0;i<slices.length;i++){
+        const start = i*sliceAngle + angle;
+        const end = start + sliceAngle;
+        ctx.beginPath();
+        ctx.moveTo(center.x,center.y);
+        ctx.fillStyle = slices[i].color;
+        ctx.arc(center.x,center.y,r,start,end);
+        ctx.closePath();
+        ctx.fill();
+
+        // label
+        ctx.save();
+        ctx.translate(center.x,center.y);
+        const mid = start + sliceAngle/2;
+        ctx.rotate(mid);
+        ctx.fillStyle='white';
+        ctx.textAlign='center';
+        ctx.font='18px Arial';
+        ctx.fillText(slices[i].label, r*0.55, 6);
+        ctx.restore();
+      }
+
+      // draw inner circle for aesthetics
+      ctx.beginPath(); ctx.fillStyle='#ffffff'; ctx.arc(center.x,center.y,r*0.28,0,2*Math.PI); ctx.fill();
+    }
+
+    drawWheel();
+
+    // Spin physics parameters tuned for faster, shorter spins
+    function spinWheel(){
+      if(spinning) return;
+      spinning=true;
+      document.getElementById('rewardMsg').innerText='';
+
+      // initial angular velocity (radians per frame-ish)
+      let angularVelocity = (Math.random()*0.6 + 1.2); // faster
+      const deceleration = 0.96; // per frame multiplier (higher -> stops quicker)
+
+      function frame(){
+        angle += angularVelocity;
+        angularVelocity *= deceleration;
+        drawWheel();
+        if(angularVelocity > 0.02){
+          requestAnimationFrame(frame);
+        } else {
+          spinning=false;
+          // normalize angle
+          angle = angle % (2*Math.PI);
+          // Determine slice at pointer on right (pointerAngle = 0 radians)
+          // We compute which slice covers angle 0 when wheel is rotated by 'angle'
+          // Effectively: rotatedAngle = (2π - angle) mod 2π; index = floor(rotatedAngle / sliceAngle)
+          const sliceAngle = 2*Math.PI/slices.length;
+          const rotatedAngle = (2*Math.PI - (angle % (2*Math.PI))) % (2*Math.PI);
+          const idx = Math.floor(rotatedAngle / sliceAngle) % slices.length;
+          const selected = slices[idx];
+          handleSlice(selected.label);
+        }
+      }
+      requestAnimationFrame(frame);
+    }
+
+    // ------------------ Handle slice: pick reward and question set ------------------
+    let currentQuestion=null; let currentReward='';
+
+    function handleSlice(label){
+      try{
+        if(label==='DIFFICULT'){
+          currentReward = Math.random()<0.5? 'Double Greencard' : 'Double Five';
+          currentQuestion = randomFrom(hardQ);
+        } else if(label==='MEDIUM'){
+          currentReward = Math.random()<0.5? 'Five' : 'Greencard';
+          currentQuestion = randomFrom(medQ);
+        } else {
+          currentReward = 'A Star';
+          currentQuestion = randomFrom(easyQ);
+        }
+        renderQuestion(currentQuestion);
+      } catch(e){ showFatal(e); }
+    }
+
+    // ------------------ Render question according to its type ------------------
+    function renderQuestion(q){
+      const qEl = document.getElementById('question');
+      const cEl = document.getElementById('choices');
+      const rEl = document.getElementById('rewardMsg');
+      rEl.innerText='';
+      cEl.innerHTML='';
+
+      if(!q) return;
+
+      if(q.type==='mc' || q.type===undefined){
+        qEl.innerText = q.q;
+        q.a.forEach(opt=>{
+          const d=document.createElement('div'); d.className='choice'; d.innerText=opt;
+          d.onclick = ()=>checkAnswer(opt);
+          cEl.appendChild(d);
+        });
+      } else if(q.type==='insert' || q.type==='placement' || q.type==='correct' || q.type==='rewrite' || q.type==='form' || q.type==='context'){
+        qEl.innerText = q.q;
+        q.options.forEach(opt=>{
+          const d=document.createElement('div'); d.className='choice'; d.innerText=opt;
+          d.onclick = ()=>checkAnswer(opt);
+          cEl.appendChild(d);
+        });
+      } else {
+        qEl.innerText = q.q;
+      }
+    }
+
+    function checkAnswer(choice){
+      try{
+        const rEl=document.getElementById('rewardMsg');
+        if(!currentQuestion){ rEl.innerText='No active question.'; return; }
+        const correct = currentQuestion.c;
+        if(choice === correct){
+          rEl.innerText = 'Correct! Reward earned: ' + currentReward;
+        } else {
+          rEl.innerText = 'Incorrect. Correct answer: ' + correct;
+        }
+        // Clear current question so user must spin again
+        currentQuestion=null;
+      } catch(e){ showFatal(e); }
+    }
+
+    // Hook up UI
+    document.getElementById('spinBtn').addEventListener('click', spinWheel);
+
+  } catch(err){ showFatal(err); }
+})();
+</script>
+</body>
+</html>
