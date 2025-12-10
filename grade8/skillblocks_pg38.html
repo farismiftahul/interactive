@@ -1,0 +1,507 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Reading Comprehension Game — Superheroes</title>
+<style>
+  :root{
+    --bg:#fffdf6;
+    --card:#ffffff;
+    --accent:#0077c8;
+    --muted:#6b6b6b;
+    --success:#1f8a3d;
+    --danger:#c0392b;
+    --glass: rgba(255,255,255,0.8);
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  }
+  body{
+    margin:0;
+    background: linear-gradient(180deg,#fff9e6 0%, #fffdf6 50%);
+    color:#222;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    padding:24px;
+  }
+  .container{
+    max-width:1000px;
+    margin: 0 auto;
+    display:grid;
+    grid-template-columns: 1fr 420px;
+    gap:18px;
+  }
+  header{
+    grid-column:1/-1;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:6px;
+  }
+  h1{
+    font-size:20px;
+    margin:0;
+    color:var(--accent);
+    letter-spacing:0.2px;
+  }
+  .subtitle{ font-size:13px; color:var(--muted); }
+  .passages{
+    background:var(--card);
+    padding:18px;
+    border-radius:12px;
+    box-shadow: 0 6px 18px rgba(19,36,57,0.06);
+    line-height:1.5;
+    max-height:680px;
+    overflow:auto;
+  }
+  .passage{
+    margin-bottom:18px;
+    padding-right:6px;
+  }
+  .passage h2{
+    font-size:15px;
+    margin:0 0 8px 0;
+    color:#0f4a6d;
+  }
+  .passage p{
+    margin:0 0 8px;
+    text-align:justify;
+  }
+  .questions{
+    background:var(--card);
+    padding:16px;
+    border-radius:12px;
+    box-shadow: 0 6px 18px rgba(19,36,57,0.06);
+    max-height:680px;
+    overflow:auto;
+  }
+  .control-row{
+    display:flex;
+    gap:8px;
+    margin-bottom:12px;
+    align-items:center;
+  }
+  button{
+    background:var(--accent);
+    color:white;
+    border:0;
+    padding:8px 12px;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:600;
+  }
+  button.secondary{
+    background:transparent;
+    color:var(--accent);
+    border:1px solid var(--accent);
+  }
+  .question{
+    border-radius:8px;
+    padding:12px;
+    margin-bottom:10px;
+    border:1px solid #f0f0f0;
+  }
+  .q-text{ font-weight:600; margin-bottom:8px; }
+  .choices{ display:flex; flex-direction:column; gap:8px; }
+  .choice{
+    display:flex;
+    gap:8px;
+    align-items:center;
+  }
+  .choice input[type="radio"], .choice input[type="checkbox"]{
+    transform:scale(1.05);
+  }
+  .short-answer input{
+    width:100%;
+    padding:8px;
+    border-radius:6px;
+    border:1px solid #ddd;
+  }
+  .feedback{ margin-top:8px; font-size:13px; }
+  .correct{ color:var(--success); font-weight:700; }
+  .incorrect{ color:var(--danger); font-weight:700; }
+  .score{
+    font-size:16px;
+    font-weight:700;
+    color:#0b3a58;
+    margin-top:8px;
+  }
+  footer{ grid-column:1/-1; margin-top:12px; color:var(--muted); font-size:13px; }
+  .meta{ font-size:13px; color:var(--muted); margin-left:auto; }
+  .explain{ font-size:13px; color:var(--muted); margin-top:6px; }
+  @media (max-width:980px){
+    .container { grid-template-columns: 1fr; padding:8px; }
+    .meta{ display:none; }
+  }
+</style>
+</head>
+<body>
+  <div class="container" role="main">
+    <header>
+      <div>
+        <h1>Reading Comprehension — Superheroes</h1>
+        <div class="subtitle">Read the two short passages and answer the 20 questions. Immediate feedback is provided.</div>
+      </div>
+      <div class="meta">20 questions · mixed format · instant feedback</div>
+    </header>
+
+    <section class="passages" aria-labelledby="passages-title">
+      <div id="passages-title" style="display:none">Passages</div>
+
+      <article class="passage" id="passage-emil">
+        <h2>Emil, Denmark</h2>
+        <p>
+          Do you ever wish you had superpowers? Well, I do. I think everyone would love to have some special powers, wouldn't they? My favourite superhero is "Martian Manhunter". He is the <strong>Swiss army knife</strong> of superheroes because he has many of the powers of Superman. He is the most powerful <strong>telepath</strong> on Earth, so he is able to read minds! I also <strong>admire</strong> his shape-shifting ability. He can easily <strong>shapeshift</strong> into anyone. For instance, in the movie Zack Snyder's <em>Justice League</em>, he turns into Superman's mother! If only Martian Manhunter didn't have any <strong>weaknesses</strong>, but he has a <strong>phobia</strong> about fire, so his powers are <strong>vulnerable</strong> to fire!
+        </p>
+      </article>
+
+      <article class="passage" id="passage-chaewon">
+        <h2>Chaewon, South Korea</h2>
+        <p>
+          Some people think superheroes are <strong>nonsense</strong>, don't they? Well, I love superheroes because it sometimes feels good to <strong>escape</strong> from reality for everyone, doesn't it? My favourite superhero is "Cyborg". He's also called Victor Stone. Victor has a <strong>horrific</strong> accident that results in the death of his mother. He gets seriously injured, but as a scientist, his father saves his life by turning him into a cyborg. Victor wishes he had died together with his mother, but when he meets Batman and Flash, he has a new <strong>purpose</strong>: Fight against the evil! I like Cyborg because he has the ability to <strong>repair</strong> non-digital devices without even touching them. I wish Cyborg didn't have any weaknesses, but unfortunately, he does! The cyborg parts of his body are <strong>vulnerable</strong> to mind control.
+        </p>
+      </article>
+    </section>
+
+    <aside class="questions" aria-labelledby="questions-title">
+      <h2 id="questions-title" style="font-size:16px; margin:0 0 12px 0; color:var(--accent)">Questions</h2>
+
+      <div class="control-row">
+        <button id="checkAll">Check All Answers</button>
+        <button id="reset" class="secondary">Reset</button>
+        <div style="margin-left:auto;">
+          <span class="score" id="finalScore" aria-live="polite"></span>
+        </div>
+      </div>
+
+      <form id="quizForm" autocomplete="off" novalidate>
+        <!-- Questions will be injected here by JavaScript -->
+      </form>
+
+      <div id="results" class="explain" aria-live="polite"></div>
+    </aside>
+
+    <footer>
+      <div>Instructions: Read the passages on the left, answer each question on the right. Click "Check All Answers" when finished to see your score and explanations. You can also check questions individually as you go — each question gives instant feedback after you submit the answer for that question.</div>
+    </footer>
+  </div>
+
+<script>
+/*
+  Quiz data: 20 questions based on the two passages.
+  Each question has:
+    - id: unique id
+    - type: "mcq" | "tf" | "short"
+    - q: question text
+    - choices: array (for mcq)
+    - answer: canonical answer (string or array for multiple correct)
+    - explanation: short justification using passage content
+*/
+const quizData = [
+  // Emil passage (1-10)
+  {id:1, type:"mcq", q:"Where is Emil from?", choices:["Denmark","Sweden","South Korea","USA"], answer:"Denmark",
+   explanation:"The passage heading says \"Emil, Denmark.\""},
+  {id:2, type:"mcq", q:"Which superhero is Emil's favourite?", choices:["Cyborg","Batman","Martian Manhunter","Superman"], answer:"Martian Manhunter",
+   explanation:"Emil writes \"My favourite superhero is 'Martian Manhunter'.\""},
+  {id:3, type:"tf", q:"Martian Manhunter has telepathic abilities (can read minds).", answer:"true",
+   explanation:"Emil says he is the most powerful telepath on Earth, able to read minds."},
+  {id:4, type:"mcq", q:"Which phrase does Emil use to describe Martian Manhunter's variety of powers?", choices:["one-trick pony","Swiss army knife","a single power","weak and vulnerable"], answer:"Swiss army knife",
+   explanation:"Emil calls him the \"Swiss army knife of superheroes\" because he has many powers."},
+  {id:5, type:"short", q:"Name one shape-shifting example Emil mentions.", answer:"superman's mother",
+   explanation:"Emil mentions that in the movie he turns into Superman's mother (Zack Snyder's Justice League)."},
+  {id:6, type:"mcq", q:"Martian Manhunter admires which of his abilities?", choices:["invisibility","shape-shifting","flight only","repair"], answer:"shape-shifting",
+   explanation:"Emil says: \"I also admire his shape-shifting ability. He can easily shapeshift into anyone.\""},
+  {id:7, type:"tf", q:"Martian Manhunter has no weaknesses.", answer:"false",
+   explanation:"Emil explicitly notes he does have a phobia about fire, so he does have weaknesses."},
+  {id:8, type:"mcq", q:"What is Martian Manhunter's specific phobia?", choices:["water","fire","heights","crowds"], answer:"fire",
+   explanation:"The passage says he has a phobia about fire."},
+  {id:9, type:"short", q:"What word does Emil use to describe Martian Manhunter's mind-reading power? (one word)", answer:"telepath",
+   explanation:"Emil calls him the most powerful \"telepath\" on Earth."},
+  {id:10, type:"mcq", q:"Because of his phobia, Martian Manhunter's powers are ____ to fire.", choices:["invincible","unaffected","vulnerable","stronger"], answer:"vulnerable",
+   explanation:"Emil states his powers are \"vulnerable to fire.\""},
+  // Chaewon passage (11-20)
+  {id:11, type:"mcq", q:"Where is Chaewon from?", choices:["Japan","South Korea","China","Denmark"], answer:"South Korea",
+   explanation:"The heading reads \"Chaewon, South Korea.\""},
+  {id:12, type:"mcq", q:"Which superhero does Chaewon prefer?", choices:["Martian Manhunter","Cyborg","Flash","Batman"], answer:"Cyborg",
+   explanation:"Chaewon states: \"My favourite superhero is 'Cyborg'.\""},
+  {id:13, type:"short", q:"What is Cyborg's real name (two words)?", answer:"Victor Stone",
+   explanation:"The text says: \"He's also called Victor Stone.\""},
+  {id:14, type:"tf", q:"Cyborg's father is a scientist who saves him after an accident.", answer:"true",
+   explanation:"The passage states the father (a scientist) saves his life by turning him into a cyborg."},
+  {id:15, type:"mcq", q:"What tragic event happens in Cyborg's story?", choices:["He loses his job","The death of his mother","He loses his powers","He moves to Denmark"], answer:"The death of his mother",
+   explanation:"It says Victor has a horrific accident that results in the death of his mother."},
+  {id:16, type:"mcq", q:"After meeting Batman and Flash, Cyborg gains a new ____.", choices:["purpose","weapon","weakness","home"], answer:"purpose",
+   explanation:"The passage: \"he has a new purpose: Fight against the evil!\""},
+  {id:17, type:"short", q:"What ability does Cyborg have that involves devices?", answer:"repair",
+   explanation:"The text: \"he has the ability to repair non-digital devices without even touching them.\""},
+  {id:18, type:"tf", q:"Chaewon thinks it feels good to escape from reality by enjoying superheroes.", answer:"true",
+   explanation:"Chaewon writes: \"it sometimes feels good to escape from reality\"."},
+  {id:19, type:"mcq", q:"What word does Chaewon use to describe some people's view of superheroes?", choices:["nonsense","useful","terrifying","ancient"], answer:"nonsense",
+   explanation:"The passage opens: \"Some people think superheroes are nonsense, don't they?\""},
+  {id:20, type:"mcq", q:"What vulnerability do Cyborg's cyborg parts have?", choices:["water damage","fire vulnerability","mind control","magnetism"], answer:"mind control",
+   explanation:"The passage says the cyborg parts are vulnerable to mind control."}
+];
+
+const form = document.getElementById('quizForm');
+const resultsDiv = document.getElementById('results');
+const finalScoreEl = document.getElementById('finalScore');
+
+function createQuestionEl(item){
+  const wrapper = document.createElement('div');
+  wrapper.className = 'question';
+  wrapper.id = `q-${item.id}`;
+
+  const qText = document.createElement('div');
+  qText.className = 'q-text';
+  qText.textContent = `${item.id}. ${item.q}`;
+  wrapper.appendChild(qText);
+
+  const inputArea = document.createElement('div');
+  inputArea.className = 'input-area';
+
+  if(item.type === 'mcq'){
+    const choicesDiv = document.createElement('div');
+    choicesDiv.className = 'choices';
+    item.choices.forEach((c, idx) => {
+      const id = `q${item.id}_choice${idx}`;
+      const label = document.createElement('label');
+      label.className = 'choice';
+      const radio = document.createElement('input');
+      radio.type = 'radio';
+      radio.name = `q${item.id}`;
+      radio.value = c;
+      radio.id = id;
+      label.appendChild(radio);
+      const span = document.createElement('span');
+      span.textContent = c;
+      label.appendChild(span);
+      choicesDiv.appendChild(label);
+    });
+    inputArea.appendChild(choicesDiv);
+  } else if(item.type === 'tf'){
+    const choicesDiv = document.createElement('div');
+    choicesDiv.className = 'choices';
+    ['true','false'].forEach((c, idx) => {
+      const id = `q${item.id}_tf${idx}`;
+      const label = document.createElement('label');
+      label.className = 'choice';
+      const radio = document.createElement('input');
+      radio.type = 'radio';
+      radio.name = `q${item.id}`;
+      radio.value = c;
+      radio.id = id;
+      label.appendChild(radio);
+      const span = document.createElement('span');
+      span.textContent = c.charAt(0).toUpperCase() + c.slice(1);
+      label.appendChild(span);
+      choicesDiv.appendChild(label);
+    });
+    inputArea.appendChild(choicesDiv);
+  } else if(item.type === 'short'){
+    const div = document.createElement('div');
+    div.className = 'short-answer';
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.name = `q${item.id}`;
+    input.placeholder = 'Type a short answer...';
+    div.appendChild(input);
+    inputArea.appendChild(div);
+  }
+
+  // Buttons for individual check
+  const controls = document.createElement('div');
+  controls.style.marginTop = '8px';
+  controls.style.display = 'flex';
+  controls.style.gap = '8px';
+  const checkBtn = document.createElement('button');
+  checkBtn.type = 'button';
+  checkBtn.textContent = 'Check';
+  checkBtn.style.background = 'transparent';
+  checkBtn.style.color = 'var(--accent)';
+  checkBtn.style.border = '1px solid var(--accent)';
+  checkBtn.style.padding = '6px 10px';
+  checkBtn.style.borderRadius = '6px';
+  checkBtn.addEventListener('click', () => checkSingle(item.id));
+  controls.appendChild(checkBtn);
+
+  const help = document.createElement('div');
+  help.className = 'feedback';
+  help.id = `feedback-${item.id}`;
+  controls.appendChild(help);
+
+  wrapper.appendChild(inputArea);
+  wrapper.appendChild(controls);
+
+  return wrapper;
+}
+
+function renderQuiz(){
+  form.innerHTML = '';
+  quizData.forEach(q => {
+    form.appendChild(createQuestionEl(q));
+  });
+}
+
+function normalizeAnswer(ans){
+  if(!ans && ans !== 0) return '';
+  return String(ans).trim().toLowerCase();
+}
+
+function checkSingle(id){
+  const q = quizData.find(x=>x.id===id);
+  const name = `q${id}`;
+  const feedbackEl = document.getElementById(`feedback-${id}`);
+  feedbackEl.innerHTML = '';
+  let userVal = null;
+  if(q.type === 'mcq' || q.type === 'tf'){
+    const selected = document.querySelector(`input[name="${name}"]:checked`);
+    if(!selected){
+      feedbackEl.innerHTML = `<span class="incorrect">Please select an answer then click Check.</span>`;
+      return false;
+    }
+    userVal = selected.value;
+    const correct = normalizeAnswer(q.answer);
+    if(normalizeAnswer(userVal) === correct){
+      feedbackEl.innerHTML = `<span class="correct">Correct.</span> <div class="explain">${q.explanation}</div>`;
+      return true;
+    } else {
+      feedbackEl.innerHTML = `<span class="incorrect">Incorrect.</span> <div class="explain"><strong>Answer:</strong> ${q.answer}. ${q.explanation}</div>`;
+      return false;
+    }
+  } else if(q.type === 'short'){
+    const input = document.querySelector(`input[name="${name}"]`);
+    userVal = input ? input.value : '';
+    if(!userVal.trim()){
+      feedbackEl.innerHTML = `<span class="incorrect">Please enter an answer then click Check.</span>`;
+      return false;
+    }
+    const correct = normalizeAnswer(q.answer);
+    const user = normalizeAnswer(userVal);
+    // Accept a few reasonable variants: exact match or includes keywords
+    const accepted = user === correct || user.includes(correct) || correct.includes(user) || (q.answer.toLowerCase().split(' ').every(s=>user.includes(s)));
+    if(accepted){
+      feedbackEl.innerHTML = `<span class="correct">Correct.</span> <div class="explain">${q.explanation}</div>`;
+      return true;
+    } else {
+      feedbackEl.innerHTML = `<span class="incorrect">Incorrect.</span> <div class="explain"><strong>Answer:</strong> ${q.answer}. ${q.explanation}</div>`;
+      return false;
+    }
+  }
+}
+
+function checkAll(){
+  let correctCount = 0;
+  let attempted = 0;
+  resultsDiv.innerHTML = '';
+  quizData.forEach(q => {
+    const res = checkSingleSilently(q.id);
+    if(res.attempted) attempted++;
+    if(res.correct) correctCount++;
+  });
+  finalScoreEl.textContent = `Score: ${correctCount} / ${quizData.length}`;
+  const percent = Math.round((correctCount/quizData.length)*100);
+  const summary = document.createElement('div');
+  summary.innerHTML = `<strong>Final result:</strong> ${correctCount}/${quizData.length} (${percent}%).`;
+  resultsDiv.appendChild(summary);
+
+  // Provide performance message
+  const msg = document.createElement('div');
+  msg.style.marginTop = '8px';
+  if(percent === 100){
+    msg.textContent = 'Excellent — perfect score.';
+  } else if(percent >= 80){
+    msg.textContent = 'Very good. A little review of missed items will help you reach perfection.';
+  } else if(percent >= 50){
+    msg.textContent = 'Good effort. Re-read the passages and review the explanations for incorrect answers.';
+  } else {
+    msg.textContent = 'Consider re-reading the passages carefully and trying again. Use the inline feedback to learn from each question.';
+  }
+  resultsDiv.appendChild(msg);
+  // Scroll to results
+  resultsDiv.scrollIntoView({behavior:'smooth'});
+}
+
+function checkSingleSilently(id){
+  const q = quizData.find(x=>x.id===id);
+  const name = `q${id}`;
+  let userVal = null;
+  let attempted = false;
+  let correct = false;
+  if(q.type === 'mcq' || q.type === 'tf'){
+    const selected = document.querySelector(`input[name="${name}"]:checked`);
+    if(selected){
+      attempted = true;
+      userVal = selected.value;
+      correct = normalizeAnswer(userVal) === normalizeAnswer(q.answer);
+    } else {
+      // not attempted
+      attempted = false;
+      correct = false;
+      const feedbackEl = document.getElementById(`feedback-${id}`);
+      feedbackEl.innerHTML = `<span class="incorrect">No answer selected. The correct answer is <strong>${q.answer}</strong>.</span><div class="explain">${q.explanation}</div>`;
+    }
+    const feedbackEl = document.getElementById(`feedback-${id}`);
+    if(attempted){
+      if(correct){
+        feedbackEl.innerHTML = `<span class="correct">Correct.</span> <div class="explain">${q.explanation}</div>`;
+      } else {
+        feedbackEl.innerHTML = `<span class="incorrect">Incorrect.</span> <div class="explain"><strong>Answer:</strong> ${q.answer}. ${q.explanation}</div>`;
+      }
+    }
+  } else if(q.type === 'short'){
+    const input = document.querySelector(`input[name="${name}"]`);
+    const user = input ? input.value : '';
+    if(user.trim()){
+      attempted = true;
+      const accepted = normalizeAnswer(user) === normalizeAnswer(q.answer) || normalizeAnswer(user).includes(normalizeAnswer(q.answer)) || normalizeAnswer(q.answer).includes(normalizeAnswer(user));
+      correct = accepted;
+      const feedbackEl = document.getElementById(`feedback-${id}`);
+      if(correct){
+        feedbackEl.innerHTML = `<span class="correct">Correct.</span> <div class="explain">${q.explanation}</div>`;
+      } else {
+        feedbackEl.innerHTML = `<span class="incorrect">Incorrect.</span> <div class="explain"><strong>Answer:</strong> ${q.answer}. ${q.explanation}</div>`;
+      }
+    } else {
+      attempted = false;
+      correct = false;
+      const feedbackEl = document.getElementById(`feedback-${id}`);
+      feedbackEl.innerHTML = `<span class="incorrect">No answer entered. The correct answer is <strong>${q.answer}</strong>.</span><div class="explain">${q.explanation}</div>`;
+    }
+  }
+  return {attempted, correct};
+}
+
+document.getElementById('checkAll').addEventListener('click', checkAll);
+document.getElementById('reset').addEventListener('click', () => {
+  if(!confirm('Reset all answers and feedback?')) return;
+  form.reset();
+  quizData.forEach(q=> {
+    const fb = document.getElementById(`feedback-${q.id}`);
+    if(fb) fb.innerHTML = '';
+  });
+  resultsDiv.innerHTML = '';
+  finalScoreEl.textContent = '';
+});
+
+// Allow pressing Enter in a short-answer field to check that specific question
+form.addEventListener('keydown', (e) => {
+  if(e.key === 'Enter'){
+    const el = document.activeElement;
+    if(el && el.tagName.toLowerCase() === 'input' && el.type === 'text'){
+      e.preventDefault();
+      // find parent question id
+      const parent = el.closest('.question');
+      if(parent){
+        const id = parseInt(parent.id.replace('q-',''),10);
+        checkSingle(id);
+      }
+    }
+  }
+});
+
+// Render on load
+renderQuiz();
+
+</script>
+</body>
+</html>
