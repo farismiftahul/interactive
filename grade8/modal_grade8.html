@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Modal Master — Possibility | Certainty | Impossibility</title>
+<title>Modal Master — Possibility | Certainty | Impossibility (20 items)</title>
 <style>
   :root{
     --bg:#f6f9fb; --panel:#ffffff; --muted:#6b7280;
@@ -159,30 +159,38 @@
 
 <script>
 /*
-  Modal Master
+  Modal Master — updated with 20 sentences.
   Drag & drop game: classify sentences under Possibility / Certainty / Impossibility.
-  - Scoring: +10 correct, -5 wrong. Streak bonus: +2 per consecutive correct.
-  - Explanation provided from the sentence dataset.
-  - Local storage stores best score in session.
+  - Scoring: +10 correct, -5 wrong. Streak bonus: +2 per consecutive correct (capped in code).
+  - Explanation provided for each sentence.
+  - Session best score stored in sessionStorage.
 */
 
-// Dataset: sentences and target category + explanation
+// Dataset: 20 sentences (text, category, explanation)
 const SENTENCES = [
   { text: "We may watch a film this evening.", cat: "possibility", explain: "Uses 'may' to indicate something possible but not certain."},
   { text: "She might be late.", cat: "possibility", explain: "Uses 'might' to express a possibility."},
   { text: "He could be at home.", cat: "possibility", explain: "Uses 'could' to show a possible situation."},
+  { text: "It might rain later, so take an umbrella.", cat: "possibility", explain: "'Might' signals that rain is possible but not certain."},
+  { text: "We could go for a walk if the weather stays nice.", cat: "possibility", explain: "'Could' suggests an option that is possible."},
+  { text: "They may arrive around six.", cat: "possibility", explain: "'May' expresses a likely but not certain arrival time."},
+  { text: "He could be the new assistant.", cat: "possibility", explain: "'Could' suggests a tentative identification."},
+  { text: "She might have taken the earlier train.", cat: "possibility", explain: "'Might have' expresses a possible past action."},
+  { text: "He may not come to the party.", cat: "possibility", explain: "Negative 'may not' indicates it is possible he will not attend."},
+
   { text: "You must be quite hungry. You haven't eaten anything for a long time.", cat:"certainty", explain:"'Must' is used when the speaker concludes something is very likely or true based on evidence."},
   { text: "She must be at the office. I've just talked to her.", cat:"certainty", explain:"'Must' indicates a confident conclusion (evidence: recent conversation)."},
   { text: "You must be the director of the film. Someone told me the director had a beard like you.", cat:"certainty", explain:"'Must' expresses a strong inference based on information."},
+  { text: "They must have left already — the lights are off.", cat:"certainty", explain:"'Must have' expresses a logical conclusion based on evidence."},
+  { text: "You must be joking.", cat:"certainty", explain:"'Must' is used here to express a strong inference (often exasperation or disbelief)."},
+  { text: "They must be enjoying themselves — they're laughing loudly.", cat:"certainty", explain:"Evidence (laughter) leads to a confident conclusion using 'must'."},
+
   { text: "You can't get lost here — you know the area well.", cat:"impossibility", explain:"'Can't' expresses that getting lost is impossible given the knowledge of the area."},
   { text: "The film we are watching is very boring. You can't be serious when you say you like it.", cat:"impossibility", explain:"'Can't' rejects the possibility of sincerity — used to show impossibility."},
   { text: "Someone's knocking at the door. He can't be John because he is at the office.", cat:"impossibility", explain:"'Can't' rules out John as the knocker because of evidence he is at the office."},
-  // Extra practice items
-  { text: "It might rain later, so take an umbrella.", cat:"possibility", explain:"'Might' signals that rain is possible but not certain."},
-  { text: "They must have left already — the lights are off.", cat:"certainty", explain:"'Must have' expresses a logical conclusion based on evidence."},
   { text: "He can't have finished the work already; he started only an hour ago.", cat:"impossibility", explain:"'Can't have' expresses that something is impossible given what is known."},
-  { text: "We could go for a walk if the weather stays nice.", cat:"possibility", explain:"'Could' suggests an option that is possible."},
-  { text: "You must be joking!", cat:"impossibility", explain:"In informal speech 'must be joking' can also be used ironically; here it's treated as a strong rejection (certainty/impossibility intersection)."},
+  { text: "You can't possibly lift that by yourself.", cat:"impossibility", explain:"'Can't possibly' emphasises that an action is not feasible."},
+  { text: "It can't be true that prices dropped overnight.", cat:"impossibility", explain:"'Can't be true' is used to reject the possibility of an unlikely event."}
 ];
 
 // Game state
@@ -310,7 +318,7 @@ function handlePlacement(el, binType){
   if(!el) return;
   const correct = el.getAttribute('data-cat') === binType;
   // Remove from pool visually and state
-  el.parentNode.removeChild(el);
+  if(el.parentNode) el.parentNode.removeChild(el);
   state.pool = state.pool.filter(p => p.id !== el.id);
 
   // update placed counts
@@ -347,10 +355,20 @@ function handlePlacement(el, binType){
   }
 }
 
-// helper to find sentence by generated id
+// helper to find sentence by generated id or by matching text
 function getSentenceById(id){
-  // we used slice of SENTENCES and added id — but when pool changes we still have the dataset in state. placed ones may be gone, so track by text matching fallback
-  return (SENTENCES.concat(state.pool)).find(s => s.id === id) || state.pool.find(p => p.id === id) || SENTENCES.find(s => s.text === document.getElementById(id)?.textContent) || {cat:'unknown', explain:''};
+  // find in current pool
+  let found = state.pool.find(s => s.id === id);
+  if(found) return found;
+  // otherwise search original list by text matching
+  const el = document.getElementById(id);
+  if(el){
+    const text = el.textContent;
+    found = SENTENCES.find(s => s.text === text);
+    if(found) return found;
+  }
+  // fallback
+  return {cat:'unknown', explain:''};
 }
 
 // Result feedback
