@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Progress Tracker</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --primary: #4f46e5;
+      --accent: #22c55e;
+      --danger: #ef4444;
+      --locked: #e5e7eb;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: var(--bg);
+      padding: 20px;
+    }
+
+    h1 { text-align: center; margin-bottom: 16px; }
+
+    .panel {
+      background: var(--card);
+      padding: 16px;
+      border-radius: 14px;
+      margin-bottom: 18px;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 70px;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #cbd5e1;
+      font-family: inherit;
+      font-size: 0.9rem;
+      margin-bottom: 10px;
+    }
+
+    button {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.8rem;
+      margin-left: 4px;
+    }
+
+    button.camel { background: var(--danger); }
+
+    #students {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .student-card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 10px 14px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+    }
+
+    .student-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .student-name {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .progress-container {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .stage {
+      flex: 1;
+      text-align: center;
+      position: relative;
+    }
+
+    .stage:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: 22px;
+      right: -50%;
+      width: 100%;
+      height: 6px;
+      background: var(--locked);
+      z-index: 0;
+    }
+
+    .stage.completed:not(:last-child)::after {
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+    }
+
+    .icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      margin: 0 auto 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      background: var(--locked);
+      color: #fff;
+      position: relative;
+      z-index: 1;
+    }
+
+    .stage.completed .icon {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+    }
+
+    .stage-title { font-size: 0.8rem; font-weight: 600; }
+    .reward { font-size: 0.75rem; color: #475569; }
+    .comment { font-size: 0.7rem; color: #64748b; }
+  </style>
+</head>
+<body>
+
+<h1>🎯 Student Progress Tracker</h1>
+
+<div class="panel">
+  <h2>Search Student</h2>
+  <input type="text" id="searchInput" placeholder="Type student name..." oninput="render()" style="width:100%;padding:8px;border-radius:8px;border:1px solid #cbd5e1;margin-bottom:12px;" />
+
+  <h2>Students (one per line)</h2>
+  <textarea id="studentInput">Aisha
+Daniel
+Fatima</textarea>
+
+  <h2>Stages | Reward | Comment</h2>
+  <textarea id="stageInput">Exercise 1 | Five | Good start!
+Exercise 2 | Greencard | Keep going!
+Exercise 3 | Double Five | Almost there!
+Exercise 4 | Double Greencard | Champion level!</textarea>
+
+  <button onclick="applySettings()">Apply Changes</button>
+</div>
+
+<div id="students"></div>
+
+<script>
+  const COOKIE_KEY = 'student_progress_tracker';
+
+  let students = [];
+  let stages = [];
+
+  /* ---------- COOKIE HELPERS ---------- */
+  function saveToCookie() {
+    const data = { students, stages };
+    document.cookie = COOKIE_KEY + '=' + encodeURIComponent(JSON.stringify(data)) + '; path=/; max-age=' + (60 * 60 * 24 * 30);
+  }
+
+  function loadFromCookie() {
+    const match = document.cookie.split('; ').find(row => row.startsWith(COOKIE_KEY + '='));
+    if (!match) return false;
+    try {
+      const data = JSON.parse(decodeURIComponent(match.split('=')[1]));
+      students = data.students || [];
+      stages = data.stages || [];
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /* ---------- SETUP ---------- */
+  function applySettings() {
+    students = document.getElementById('studentInput').value
+      .split('\n')
+      .filter(n => n.trim() !== '')
+      .map(n => ({ name: n.trim(), progress: 0 }));
+
+    stages = document.getElementById('stageInput').value
+      .split('\n')
+      .map(line => {
+        const [name, reward, comment] = line.split('|');
+        return {
+          name: name.trim(),
+          reward: reward?.trim() || '',
+          comment: comment?.trim() || '',
+          icon: '⭐'
+        };
+      });
+
+    saveToCookie();
+    render();
+  }
+
+  /* ---------- RENDER ---------- */
+  function render() {
+    const search = document.getElementById('searchInput')?.value.toLowerCase() || '';
+    const container = document.getElementById('students');
+    container.innerHTML = '';
+
+    students
+      .map((s, idx) => ({ ...s, _index: idx }))
+      .filter(s => s.name.toLowerCase().includes(search))
+      .forEach((student, index) => {
+      const card = document.createElement('div');
+      const realIndex = student._index;('div');
+      card.className = 'student-card';
+
+      const camelButton = student.progress === 0
+        ? `<button class="camel" onclick="camel(${realIndex})">🐪 Got eaten by a camel</button>`
+        : '';
+
+      card.innerHTML = `
+        <div class="student-header">
+          <div class="student-name">${student.name}</div>
+          <div>
+            ${camelButton}
+            <button onclick="goBack(${realIndex})">⬅ Back</button>
+            <button onclick="advance(${realIndex})">Advance ➕</button>
+          </div>
+        </div>
+        <div class="progress-container">
+          ${stages.map((stage, i) => `
+            <div class="stage ${i < student.progress ? 'completed' : ''}">
+              <div class="icon">${stage.icon}</div>
+              <div class="stage-title">${stage.name}</div>
+              <div class="reward">🎁 ${stage.reward}</div>
+              <div class="comment">${stage.comment}</div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+
+      container.appendChild(card);
+    });
+  }
+
+  /* ---------- ACTIONS ---------- */
+  function advance(i) {
+    if (students[i].progress < stages.length) {
+      students[i].progress++;
+      saveToCookie();
+      render();
+    }
+  }
+
+  function goBack(i) {
+    if (students[i].progress > 0) {
+      students[i].progress--;
+      saveToCookie();
+      render();
+    }
+  }
+
+  function camel(i) {
+    alert(students[i].name + ' got eaten by a camel 🐪');
+  }
+
+  /* ---------- INIT ---------- */
+  if (!loadFromCookie()) {
+    applySettings();
+  } else {
+    // restore textareas
+    document.getElementById('studentInput').value = students.map(s => s.name).join('\n');
+    document.getElementById('stageInput').value = stages.map(s => `${s.name} | ${s.reward} | ${s.comment}`).join('\n');
+    render();
+  }
+</script>
+
+</body>
+</html>
