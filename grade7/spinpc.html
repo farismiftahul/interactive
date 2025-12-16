@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Present Tenses Wheel Game</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: linear-gradient(120deg, #e6f0ff, #fdfefe);
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 820px;
+      margin: auto;
+      background: #ffffff;
+      border-radius: 18px;
+      box-shadow: 0 10px 28px rgba(0,0,0,0.15);
+      padding: 28px;
+      text-align: center;
+    }
+    h1 { margin-bottom: 6px; }
+    .subtitle { color: #555; margin-bottom: 20px; }
+
+    .wheel-wrapper {
+      position: relative;
+      width: 240px;
+      height: 240px;
+      margin: 20px auto;
+    }
+
+    /* Arrow reversed to point DOWN */
+    /* Arrow fixed: positioned at TOP, pointing DOWN */
+    .pointer {
+      position: absolute;
+      top: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 14px solid transparent;
+      border-right: 14px solid transparent;
+      border-top: 20px solid #2d7ff9;
+      z-index: 5;
+    }
+
+    .wheel {
+      width: 240px;
+      height: 240px;
+      border-radius: 50%;
+      border: 8px solid #2d7ff9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      background-image: url('https://as2.ftcdn.net/jpg/02/93/97/11/1000_F_293971172_0W4FORi7SeKo4MpQCL7q6TogW14CuW2k.jpg'); /* REPLACE with your wheel image */
+      background-size: cover;
+      background-position: center;
+      transition: transform 3s cubic-bezier(0.33, 1, 0.68, 1);
+    }
+
+    .labels {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+
+    .question-box {
+      background: #f4f7ff;
+      border-radius: 14px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+
+    input[type="text"] {
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      width: 65%;
+      margin-top: 10px;
+    }
+
+    button {
+      margin-top: 12px;
+      padding: 8px 16px;
+      border-radius: 10px;
+      border: none;
+      background: #2d7ff9;
+      color: #fff;
+      cursor: pointer;
+      font-size: 15px;
+    }
+
+    .feedback {
+      margin-top: 12px;
+      font-weight: bold;
+    }
+
+    .reward {
+      margin-top: 10px;
+      font-size: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Present Tenses Wheel</h1>
+    <div class="subtitle">Spin the wheel → answer one question → earn rewards</div>
+
+    <div class="labels">
+      <span style="color:#ffd966">Easy</span>
+      <span style="color:#7cc576">Medium</span>
+      <span style="color:#f28b82">Difficult</span>
+    </div>
+
+    <div class="wheel-wrapper">
+      <div class="pointer"></div>
+      <div id="wheel" class="wheel" onclick="spinWheel()"></div>
+    </div>
+
+    <div id="questionArea" class="question-box" style="display:none;">
+      <p id="difficulty"></p>
+      <p id="question"></p>
+      <input type="text" id="answer" placeholder="Type your answer here">
+      <br>
+      <button onclick="checkAnswer()">Check</button>
+      <button onclick="revealAnswer()">Reveal</button>
+      <div id="feedback" class="feedback"></div>
+      <div id="reward" class="reward"></div>
+    </div>
+  </div>
+
+  <script>
+    const wheel = document.getElementById('wheel');
+
+    const questions = [
+      {q:"She usually ___ (walk) to school.", a:"walks", d:"easy"},
+      {q:"Look! The children ___ (play) outside.", a:"are playing", d:"easy"},
+      {q:"He ___ (not / like) coffee.", a:"does not like", d:"easy"},
+      {q:"We ___ (study) English every day.", a:"study", d:"easy"},
+      {q:"Listen! The phone ___ (ring).", a:"is ringing", d:"easy"},
+      {q:"She ___ (watch) TV at the moment.", a:"is watching", d:"medium"},
+      {q:"They usually ___ (have) dinner at 7.", a:"have", d:"medium"},
+      {q:"He ___ (not / work) on Sundays.", a:"does not work", d:"medium"},
+      {q:"I ___ (read) a very good book this week.", a:"am reading", d:"medium"},
+      {q:"We ___ (go) to the gym twice a week.", a:"go", d:"medium"},
+      {q:"She usually ___ (drive) to work, but today she ___ (take) the bus.", a:"drives, is taking", d:"difficult"},
+      {q:"They ___ (play) football every weekend, but today they ___ (rest).", a:"play, are resting", d:"difficult"},
+      {q:"We ___ (work) late this week because we ___ (have) exams.", a:"are working, have", d:"difficult"},
+      {q:"I usually ___ (drink) tea, but now I ___ (drink) coffee.", a:"drink, am drinking", d:"difficult"},
+      {q:"She always ___ (arrive) early.", a:"arrives", d:"easy"},
+      {q:"Look! It ___ (snow).", a:"is snowing", d:"easy"},
+      {q:"We ___ (not / go) to school on Sundays.", a:"do not go", d:"easy"},
+      {q:"He ___ (write) emails at the moment.", a:"is writing", d:"easy"},
+      {q:"My father ___ (work) in a hospital.", a:"works", d:"medium"},
+      {q:"They ___ (not / watch) TV now.", a:"are not watching", d:"medium"},
+      {q:"Water ___ (boil) at 100°C.", a:"boils", d:"medium"},
+      {q:"She ___ (talk) on the phone right now.", a:"is talking", d:"medium"},
+      {q:"The train ___ (leave) at 6 every morning.", a:"leaves", d:"easy"},
+      {q:"He ___ (teach) maths at this school.", a:"teaches", d:"easy"},
+      {q:"They ___ (build) a new house this year.", a:"are building", d:"medium"},
+      {q:"She usually ___ (not / eat) meat, but today she ___ (try) fish.", a:"usually does not eat, is trying", d:"difficult"},
+      {q:"He ___ (not / play) football this week.", a:"is not playing", d:"medium"},
+      {q:"I ___ (prepare) for my exam these days.", a:"am preparing", d:"medium"},
+      {q:"It ___ (rain) now.", a:"is raining", d:"easy"}
+    ];
+
+    let current = null;
+    let rotation = 0;
+
+    function spinWheel() {
+      if (questions.length === 0) {
+        alert('No more questions!');
+        return;
+      }
+
+      const spinDegrees = Math.floor(Math.random() * 360) + 720;
+      rotation += spinDegrees;
+      wheel.style.transform = `rotate(${rotation}deg)`;
+
+      setTimeout(() => {
+        /* Because the arrow is at the BOTTOM, we offset by 180 degrees */
+        // conic-gradient starts at 3 o’clock; arrow is at 12 o’clock
+        // adjust by -90 degrees to align visual color with logic
+        const angle = (rotation - 90 + 360) % 360;
+        let diff;
+        if (angle >= 0 && angle < 120) diff = 'easy';
+        else if (angle >= 120 && angle < 240) diff = 'medium';
+        else diff = 'difficult';
+
+        const pool = questions.filter(q => q.d === diff);
+        current = pool.length
+          ? pool[Math.floor(Math.random() * pool.length)]
+          : questions[Math.floor(Math.random() * questions.length)];
+
+        questions.splice(questions.indexOf(current), 1);
+
+        document.getElementById('difficulty').textContent = 'Difficulty: ' + diff.toUpperCase();
+        document.getElementById('question').textContent = current.q;
+        document.getElementById('answer').value = '';
+        document.getElementById('feedback').textContent = '';
+        document.getElementById('reward').textContent = '';
+        document.getElementById('questionArea').style.display = 'block';
+      }, 3000);
+    }
+
+    function checkAnswer() {
+      const user = document.getElementById('answer').value.toLowerCase().trim();
+      const correct = current.a.toLowerCase();
+      const fb = document.getElementById('feedback');
+      const rw = document.getElementById('reward');
+
+      if (user === correct) {
+        fb.textContent = 'Correct!';
+        fb.style.color = 'green';
+        if (current.d === 'difficult') rw.textContent = '🏆 Double Five / Double Green Card';
+        else if (current.d === 'medium') rw.textContent = '⭐ Star';
+        else rw.textContent = '🟢 Green Card or Five';
+      } else {
+        fb.textContent = 'Not correct.';
+        fb.style.color = 'red';
+      }
+    }
+
+    function revealAnswer() {
+      document.getElementById('feedback').textContent = 'Answer: ' + current.a;
+      document.getElementById('feedback').style.color = '#2d7ff9';
+    }
+  </script>
+</body>
+</html>
