@@ -72,6 +72,10 @@
     <h1>Student Nomination Wheel</h1>
     <div class="subtitle">Spin to randomly select a student</div>
 
+    <label style="display:block;margin-bottom:10px;font-size:14px;">
+      <input type="checkbox" id="noRepeat"> Do not repeat students
+    </label>
+
     <div class="frame" id="frame">
       <img id="photo" src="" alt="Student photo" />
     </div>
@@ -82,7 +86,7 @@
 
   <script>
     // === Student images (25 total) ===
-    const images = [
+    const allImages = [
       'https://cloudt.edupage.org/cloud?z%3Af0JppPaX3LK5nexQ4SR%2FF4MF28J9Fx46ciQQOOcRUy5gIFqMSiVN1mASnokkhCc7XSU68g6ql3Ld7JkSIQ6BQwM3DDCi5C0C%2F%2BAUPySyIA8%3D',
       'https://cloudt.edupage.org/cloud?z%3Avs7o07jV3Z%2BIHnj1nDNVbjNyeQUIcEy0oXSAcKF1p3KMeRJgns3YqpgotV9AixFyXNQoixqfD4GCKtJ02%2FdrZ9tXqelsaN4MJa9xxxkkFWk%3D',
       'https://cloudt.edupage.org/cloud?z%3ApaW59BEWbfvP86YfV%2BmVONamuSmIW8Ir2F3Db9dmZd8lUCbpLeP00fJ%2FHc%2B8qyTapLSZujkOOHqm9v9dS7%2BB3LAaI%2FZOcZyasGLrDxLSkqs%3D',
@@ -112,8 +116,16 @@
     const frame = document.getElementById('frame');
     const result = document.getElementById('result');
     const spinBtn = document.getElementById('spinBtn');
+    const noRepeatCheckbox = document.getElementById('noRepeat');
 
+    let availableImages = [];
     let spinning = false;
+
+    function resetAvailableImages() {
+      availableImages = [...allImages];
+    }
+
+    resetAvailableImages();
 
     function spin() {
       if (spinning) return;
@@ -133,32 +145,38 @@
       const start = Date.now();
 
       const interval = setInterval(() => {
-        img.src = images[index % images.length];
+        const pool = noRepeatCheckbox.checked ? availableImages : allImages;
+        img.src = pool[index % pool.length];
         index++;
 
         if (Date.now() - start >= totalTime) {
           clearInterval(interval);
-          const chosen = images[Math.floor(Math.random() * images.length)];
+          const finalPool = noRepeatCheckbox.checked ? availableImages : allImages;
+          const chosenIndex = Math.floor(Math.random() * finalPool.length);
+          const chosen = finalPool[chosenIndex];
+
+          if (noRepeatCheckbox.checked) {
+            availableImages.splice(chosenIndex, 1);
+            if (availableImages.length === 0) resetAvailableImages();
+          }
+
           img.src = chosen;
-
-          // Disable fisheye on final reveal
-          img.style.filter = 'none';
-
+          img.style.filter = 'none'; // disable fisheye on reveal
           result.textContent = '🎯 Selected Student';
           spinning = false;
         }
       }, intervalTime);
     }
 
-    // Wire button
     spinBtn.addEventListener('click', spin);
 
     // Preload first image
-    img.src = images[0];
+    img.src = allImages[0];
 
     // === Lightweight self-tests (console) ===
-    console.assert(Array.isArray(images) && images.length === 25, 'Expected exactly 25 student images');
+    console.assert(Array.isArray(allImages) && allImages.length === 25, 'Expected exactly 25 student images');
     console.assert(typeof spin === 'function', 'spin() should be defined');
+    console.assert(availableImages.length === 25, 'availableImages should initialize with 25 items');
   </script>
 </body>
 </html>
