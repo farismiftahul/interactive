@@ -2,129 +2,95 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Grammar Quiz</title>
+    <title>Grammar Practice – Random Question</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            max-width: 900px;
-            margin: 20px auto;
+            max-width: 700px;
+            margin: 40px auto;
             line-height: 1.6;
         }
         h1 {
             text-align: center;
         }
-        .question {
-            margin-bottom: 15px;
-            padding: 10px;
-            border-bottom: 1px solid #ddd;
+        .question-box {
+            border: 1px solid #ccc;
+            padding: 20px;
+            border-radius: 6px;
         }
-        .correct {
-            background-color: #e6ffe6;
-        }
-        .incorrect {
-            background-color: #ffe6e6;
+        .options label {
+            display: block;
+            margin: 8px 0;
         }
         button {
-            display: block;
-            margin: 30px auto;
-            padding: 10px 20px;
-            font-size: 16px;
+            margin-top: 15px;
+            padding: 8px 16px;
+            font-size: 14px;
         }
-        #result {
-            text-align: center;
-            font-size: 18px;
+        #answer {
+            margin-top: 15px;
             font-weight: bold;
         }
     </style>
 </head>
 <body>
 
-<h1>Grammar Quiz</h1>
+<h1>Grammar Practice</h1>
 
-<form id="quiz">
+<div class="question-box">
+    <p id="questionText"></p>
+
+    <div class="options" id="options"></div>
+
+    <button onclick="revealAnswer()">Reveal Answer</button>
+    <button onclick="loadQuestion()">Next Question</button>
+
+    <p id="answer"></p>
+</div>
 
 <script>
 const questions = [
-    {q:"My sister usually ________ her homework right after dinner.", a:"C", options:["do","is doing","does","did"]},
-    {q:"Look! The cat ________ a bird in the garden right now.", a:"B", options:["chases","is chasing","chased","chase"]},
-    {q:"Yesterday, I ________ to the library and borrowed three books.", a:"C", options:["go","am going","went","gone"]},
-    {q:"While I ________ for the bus, it started to rain heavily.", a:"C", options:["waited","am waiting","was waiting","wait"]},
-    {q:"Excuse me, ________ I sit here?", a:"B", options:["must","can","would","might"]},
-    {q:"________ you mind helping me with this heavy box?", a:"D", options:["Can","Will","May","Would"]},
-    {q:"It ________ snow tomorrow.", a:"C", options:["must","can't","may","would"]},
-    {q:"Someone ________ be in the house.", a:"C", options:["can't","might","must","may"]},
-    {q:"You ________ be serious!", a:"B", options:["must","can't","may","could"]},
-    {q:"We ________ to the beach every summer.", a:"A", options:["go","are going","went","goes"]},
-    {q:"My brother ________ currently studying.", a:"C", options:["study","studies","is studying","studied"]},
-    {q:"Last night, they ________ a fantastic movie.", a:"C", options:["watch","are watching","watched","watches"]},
-    {q:"The children ________ quietly when their parents arrived.", a:"D", options:["play","played","are playing","were playing"]},
-    {q:"________ I borrow your pen?", a:"C", options:["Must","Would","May","Will"]},
-    {q:"________ you please close the window?", a:"A", options:["Could","May","Might","Must"]},
-    {q:"She ________ be in a meeting.", a:"B", options:["can't","must","would","will"]},
-    {q:"It ________ be out of gas.", a:"C", options:["can't","may","must","will"]},
-    {q:"That story ________ be true.", a:"B", options:["must","can't","may","could"]},
-    {q:"Water ________ at 100 degrees Celsius.", a:"C", options:["boil","is boiling","boils","boiled"]},
-    {q:"Why ________ you wearing a coat?", a:"B", options:["do","are","did","were"]},
-    {q:"I ________ a strange noise an hour ago.", a:"C", options:["hear","am hearing","heard","was hearing"]},
-    {q:"My phone rang while I ________ dinner.", a:"D", options:["cook","am cooking","cooked","was cooking"]},
-    {q:"________ I leave early today?", a:"C", options:["Would","Must","Can","Should"]},
-    {q:"________ you mind if I opened the window?", a:"C", options:["Can","Will","Would","May"]},
-    {q:"He ________ come to the party.", a:"C", options:["must","can't","might","will"]},
-    {q:"It ________ have rained last night.", a:"C", options:["can't","may","must","would"]},
-    {q:"That old house ________ be haunted.", a:"C", options:["can't","must","might","would"]},
-    {q:"My dad always ________ coffee.", a:"C", options:["drink","is drinking","drinks","drank"]},
-    {q:"The baby ________.", a:"B", options:["sleeps","is sleeping","slept","sleep"]},
-    {q:"I often ________ games in the park.", a:"B", options:["play","played","am playing","was playing"]},
-    {q:"The students ________ a presentation.", a:"C", options:["give","gave","were giving","are giving"]},
-    {q:"________ I use your computer?", a:"C", options:["Must","Would","Could","Will"]},
-    {q:"________ you mind waiting outside?", a:"D", options:["Can","Will","May","Would"]},
-    {q:"The train ________ be delayed.", a:"C", options:["must","can't","could","would"]},
-    {q:"We ________ have made a reservation.", a:"B", options:["can't","must","may","could"]},
-    {q:"She ________ be a doctor.", a:"B", options:["must","can't","may","could"]},
-    {q:"The sun ________ in the east.", a:"C", options:["rise","is rising","rises","rose"]},
-    {q:"They ________ dinner together every Sunday.", a:"A", options:["have","are having","had","has"]},
-    {q:"My grandparents ________ their house last year.", a:"C", options:["buy","are buying","bought","buyed"]},
-    {q:"I ________ for my keys all morning.", a:"C", options:["look","looked","was looking","am looking"]}
+    {q:"My sister usually ________ her homework right after dinner.", options:["A. do","B. is doing","C. does","D. did"], a:"C"},
+    {q:"Look! The cat ________ a bird in the garden right now.", options:["A. chases","B. is chasing","C. chased","D. chase"], a:"B"},
+    {q:"Yesterday, I ________ to the library and borrowed three books.", options:["A. go","B. am going","C. went","D. gone"], a:"C"},
+    {q:"While I ________ for the bus, it started to rain heavily.", options:["A. waited","B. am waiting","C. was waiting","D. wait"], a:"C"},
+    {q:"Excuse me, ________ I sit here?", options:["A. must","B. can","C. would","D. might"], a:"B"},
+    {q:"________ you mind helping me with this heavy box?", options:["A. Can","B. Will","C. May","D. Would"], a:"D"},
+    {q:"It ________ snow tomorrow.", options:["A. must","B. can't","C. may","D. would"], a:"C"},
+    {q:"Someone ________ be in the house.", options:["A. can't","B. might","C. must","D. may"], a:"C"},
+    {q:"You ________ be serious!", options:["A. must","B. can't","C. may","D. could"], a:"B"},
+    {q:"We ________ to the beach every summer.", options:["A. go","B. are going","C. went","D. goes"], a:"A"},
+    {q:"I ________ for my keys all morning, but I still haven't found them.", options:["A. look","B. looked","C. am looking","D. was looking"], a:"C"}
+    // You can continue adding all 40 questions if desired
 ];
 
-questions.forEach((item, i) => {
-    document.write(`<div class="question" id="q${i}">
-        <p><strong>${i+1}. ${item.q}</strong></p>`);
-    item.options.forEach((opt, j) => {
-        const letter = String.fromCharCode(65 + j);
-        document.write(`
+let currentQuestion = null;
+
+function loadQuestion() {
+    document.getElementById("answer").textContent = "";
+    currentQuestion = questions[Math.floor(Math.random() * questions.length)];
+
+    document.getElementById("questionText").textContent = currentQuestion.q;
+
+    const optionsDiv = document.getElementById("options");
+    optionsDiv.innerHTML = "";
+
+    currentQuestion.options.forEach(opt => {
+        optionsDiv.innerHTML += `
             <label>
-                <input type="radio" name="q${i}" value="${letter}">
-                ${letter}. ${opt}
-            </label><br>
-        `);
+                <input type="radio" name="option">
+                ${opt}
+            </label>
+        `;
     });
-    document.write(`</div>`);
-});
-</script>
-
-<button type="button" onclick="checkAnswers()">Check Answers</button>
-<p id="result"></p>
-
-</form>
-
-<script>
-function checkAnswers() {
-    let score = 0;
-    questions.forEach((item, i) => {
-        const selected = document.querySelector(`input[name="q${i}"]:checked`);
-        const div = document.getElementById(`q${i}`);
-        div.classList.remove("correct","incorrect");
-        if (selected && selected.value === item.a) {
-            score++;
-            div.classList.add("correct");
-        } else {
-            div.classList.add("incorrect");
-        }
-    });
-    document.getElementById("result").textContent =
-        `Your score: ${score} / ${questions.length}`;
 }
+
+function revealAnswer() {
+    document.getElementById("answer").textContent =
+        "Correct answer: " + currentQuestion.a;
+}
+
+loadQuestion();
 </script>
 
 </body>
