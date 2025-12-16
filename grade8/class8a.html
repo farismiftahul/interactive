@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Student Nomination Wheel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: linear-gradient(120deg, #e6f0ff, #fdfefe);
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: #ffffff;
+      border-radius: 18px;
+      box-shadow: 0 10px 28px rgba(0,0,0,0.15);
+      padding: 28px;
+      text-align: center;
+    }
+    h1 { margin-bottom: 6px; }
+    .subtitle { color: #555; margin-bottom: 20px; }
+
+    .frame {
+      width: 280px;
+      height: 280px;
+      margin: 20px auto;
+      border-radius: 50%;
+      border: 10px solid #2d7ff9;
+      overflow: hidden;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      transition: transform 3s cubic-bezier(0.33, 1, 0.68, 1);
+    }
+
+    .frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: none; /* default: no fisheye */
+    }
+
+    button {
+      margin-top: 18px;
+      padding: 12px 24px;
+      border-radius: 14px;
+      border: none;
+      background: #2d7ff9;
+      color: #fff;
+      cursor: pointer;
+      font-size: 18px;
+    }
+
+    .result {
+      margin-top: 20px;
+      font-size: 20px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <!-- SVG filter for fisheye effect -->
+  <svg width="0" height="0">
+    <filter id="fisheye">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="0" result="blur" />
+      <feDisplacementMap in="SourceGraphic" in2="blur" scale="25" xChannelSelector="R" yChannelSelector="G" />
+    </filter>
+  </svg>
+
+  <div class="container">
+    <h1>Student Nomination Wheel</h1>
+    <div class="subtitle">Spin to randomly select a student</div>
+
+    <div class="frame" id="frame">
+      <img id="photo" src="" alt="Student photo" />
+    </div>
+
+    <button id="spinBtn">SPIN</button>
+    <div id="result" class="result"></div>
+  </div>
+
+  <script>
+    // === Student images (25 total) ===
+    const images = [
+      'https://cloudt.edupage.org/cloud?z%3Af0JppPaX3LK5nexQ4SR%2FF4MF28J9Fx46ciQQOOcRUy5gIFqMSiVN1mASnokkhCc7XSU68g6ql3Ld7JkSIQ6BQwM3DDCi5C0C%2F%2BAUPySyIA8%3D',
+      'https://cloudt.edupage.org/cloud?z%3Avs7o07jV3Z%2BIHnj1nDNVbjNyeQUIcEy0oXSAcKF1p3KMeRJgns3YqpgotV9AixFyXNQoixqfD4GCKtJ02%2FdrZ9tXqelsaN4MJa9xxxkkFWk%3D',
+      'https://cloudt.edupage.org/cloud?z%3ApaW59BEWbfvP86YfV%2BmVONamuSmIW8Ir2F3Db9dmZd8lUCbpLeP00fJ%2FHc%2B8qyTapLSZujkOOHqm9v9dS7%2BB3LAaI%2FZOcZyasGLrDxLSkqs%3D',
+      'https://cloudt.edupage.org/cloud?z%3AAlgAs78WPJnSq12hyD35NqJBrv6%2F91W0yR7AWymTThRv8C6W6qsw0WFQKE0JppInbN%2FlXqgPPi%2FC29UVDPLRAcNIsr4eHJTLjpW2V3aPUKE%3D',
+      'https://cloudt.edupage.org/cloud?z%3AxNvhHatfxE6wiOUOJ6IBgTimAIeMEStxHGNfbMoCGjK1lp7WBm8igBVE7zmDw%2FkfOWaaYTGn6XEVIClMq8gnOn3619L2KVsDmb7X8E0CfrY%3D',
+      'https://cloudt.edupage.org/cloud?z%3ASpCREyvoOZtOW7uOQQ7RfweiCOtsmgS%2B%2FlUJHCHn3KCMpqcKp8rRqMOQxZGqx3Ro%2BLDUhXLHKRNe0lpqj2OWJD62rS0mJHK39jID3RKy3aY%3D',
+      'https://cloudt.edupage.org/cloud?z%3AsNYA%2BJppRTUi4bIC%2FqCKinwmqtaeVN91pLSWJX270Jb4PbO%2B2WBju4AiLRWoJhlI9vSyeE%2FzXPiCCqLrOPkBvchkxUZB6yFKs%2FswxNAz7UA%3D',
+      'https://cloudt.edupage.org/cloud?z%3A93LhNAydg2Zz4ub5eqmJeQ0jpZCi1ByqV7UbHCEgrgiz39TrxAaJYTzysTSvmmV4nuurTkdH2O63nzBaHQo8pwrK0pf3UxzYfxPhsu%2FOf5E%3D',
+      'https://cloudt.edupage.org/cloud?z%3A3MTNRhICvOBYuYG4guEC204JUoesCdetnurCeEQSar1VIPRUrJtV22dOc8kyORuo6kSShSjMWoimZj4bz3olgxAbgtZBCuAJkOk9E7HwLfc%3D',
+      'https://cloudt.edupage.org/cloud?z%3AEvC9%2F2XW7GhIU8olMhuZnBx8cTNTJDgK%2B0P9ufdN%2FIwUBf15HdcS7XVPoyxPZ7ywoOnVOa3XpAA6bP42WJFDPKeYee5yP1GndNHLGCqTlHk%3D',
+      'https://cloudt.edupage.org/cloud?z%3Aehj%2FdK4dowo%2FDAbfck040pEqvu3yerGE6Aw0k%2ByEm%2BRTKJBDbjeLAvH8rsn67%2FZkFGjLi3ildznAWk%2F5IXanZAZptcy3aiqBdvM6lWtfwsk%3D',
+      'https://cloudt.edupage.org/cloud?z%3AVJCMecSEM%2Bz0quUequOvWZvC13aiMs6hTgW9gDhSKTHmRKe7iyw6j0uZcwo3YWTbNnB%2BTspSIa%2FT7NWkIwHe5AlWK3ZfIOfW%2FAK2ZYc0e2c%3D',
+      'https://cloudt.edupage.org/cloud?z%3Au%2BlRLTY%2Bvq4%2BdAxYDBorRSz7rFrpFouVVAaQHYU9WlpPgD3GXu5uYU2I15R5%2F%2FVls7daGLCbcwPd6BAbfa3Tj5QVGDzb9Jypzxuf2LDYEL4%3D',
+      'https://cloudt.edupage.org/cloud?z%3AM4TssYwNVFYzhmcjJuEu30zAbS2BCTuFsP5lUICfAcOEwy0YU73MJDNl00NIvpkf4%2F7bQetM2EcdHGXGv9ACcycjY22D0FbnAoBmFVBSYmE%3D',
+      'https://cloudt.edupage.org/cloud?z%3AL%2B0UrCU6NaN%2FNKeP4rw6XD4R%2FUNTJKHd0DlBMLRSn6AHroUsmwubxm53%2FuOXS6yscb0dg8fjsuxBIkAki0r%2Fi54U%2BUb2srDms8BjogoM6MQ%3D',
+      'https://cloudt.edupage.org/cloud?z%3AQa4us6UU5NvYFN%2BgoY70XULckWCUCZOydzvaud9IYw2mUZOe%2F5qSTPpcD3rN29llFHp4QQncjvz0VXzqbMwzg3K71%2BO2AAZxbhveAduudgI%3D',
+      'https://cloudt.edupage.org/cloud?z%3AteMeQcqr7ZwaBGa7jwtaAP%2F7dPTq%2BsA%2BZ9Hl7mqFI1%2Fwfv%2FckvEK0suY49CblezDjV8gpfkTVPrvkkv3nnQYLojayL4eY1MbBilTR4xKX1w%3D',
+      'https://cloudt.edupage.org/cloud?z%3AnZcnEtwHbr0ZBecQj2kFvYOs9vau9TW65LSUCBxmtRjZehCFu9Ke0ejLmoH8FG8EIKtpjsLzp5a6Pn6R2LAd0gdViq3J8bZFg1J3YmGRg50%3D',
+      'https://cloudt.edupage.org/cloud?z%3AC9sUpXkYy2LHgQPyGz4YUC83DN4QXbPHhdeUIlT7lI5%2BBPWY41LzG3ZtVdX5LuJ4HRSQZi1vwWED5dQkEsDAEOY2NEbeMMNdkOoNowKWwUE%3D',
+      'https://cloudt.edupage.org/cloud?z%3Aa3Tt%2BL814ngvQQ6t6as1Nt0CytapBxEMIuJA6W33ckspjzEvwKjp7%2FFPNooBWVMOfZBiP6f754VCojdm%2BqJEXTKH2BiTAR69%2BA57yZfioSs%3D',
+      'https://cloudt.edupage.org/cloud?z%3Ag3FPXSJF9PN197bbPZ%2B1VTaKqflUvzw8JiTU1pdzlGWRvKzo7421JyiX%2FQY4MvPzA4Ce57AK7lys%2Btdg0pRSKVBW3Qe4vKWrNJwdhPtT4sg%3D',
+      'https://cloudt.edupage.org/cloud?z%3AsTfTWcwyAwfrk0RXaRXDEprDo5kgqgC88hTvSq8bBnGx%2BSUISbnoDj86S%2FHKPkNPHUn4rCr%2FkpB7JW7KdZvLJe1uz5xw46yRakkBCrqNx%2B8%3D',
+      'https://cloudt.edupage.org/cloud?z%3AMCBF%2BbXCktMDiiJVkoceOLzxxkqDpVdIrkuFjxRJHugid06mxfS8soV2uTFDcl1BB6Jgh5rFEL8laSoH%2B0YUkQtiy1Qm%2F2hUS4lbC4I2pUM%3D'
+    ];
+
+    const img = document.getElementById('photo');
+    const frame = document.getElementById('frame');
+    const result = document.getElementById('result');
+    const spinBtn = document.getElementById('spinBtn');
+
+    let spinning = false;
+
+    function spin() {
+      if (spinning) return;
+      spinning = true;
+      result.textContent = '';
+
+      // Enable fisheye during spin
+      img.style.filter = 'url(#fisheye)';
+
+      // Apply spin rotation
+      const spins = Math.floor(Math.random() * 4) + 4; // 4–7 rotations
+      frame.style.transform = `rotate(${spins * 360}deg)`;
+
+      let index = 0;
+      const totalTime = 3000; // ms
+      const intervalTime = 70;
+      const start = Date.now();
+
+      const interval = setInterval(() => {
+        img.src = images[index % images.length];
+        index++;
+
+        if (Date.now() - start >= totalTime) {
+          clearInterval(interval);
+          const chosen = images[Math.floor(Math.random() * images.length)];
+          img.src = chosen;
+
+          // Disable fisheye on final reveal
+          img.style.filter = 'none';
+
+          result.textContent = '🎯 Selected Student';
+          spinning = false;
+        }
+      }, intervalTime);
+    }
+
+    // Wire button
+    spinBtn.addEventListener('click', spin);
+
+    // Preload first image
+    img.src = images[0];
+
+    // === Lightweight self-tests (console) ===
+    console.assert(Array.isArray(images) && images.length === 25, 'Expected exactly 25 student images');
+    console.assert(typeof spin === 'function', 'spin() should be defined');
+  </script>
+</body>
+</html>
