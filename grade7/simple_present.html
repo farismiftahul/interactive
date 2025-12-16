@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Present Simple Interactive Lesson</title>
+  <title>Present Tenses Interactive Lesson</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
@@ -16,7 +16,7 @@
       align-items: center;
     }
     .container {
-      width: 720px;
+      width: 780px;
       background: #ffffff;
       border-radius: 18px;
       box-shadow: 0 10px 28px rgba(0,0,0,0.15);
@@ -24,30 +24,27 @@
     }
     h1 {
       text-align: center;
-      margin-bottom: 8px;
-    }
-    h2 {
-      margin-top: 0;
-      color: #2d7ff9;
+      margin-bottom: 6px;
     }
     .subtitle {
       text-align: center;
       color: #555;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
     }
     .nav {
       display: grid;
-      grid-template-columns: repeat(6, 1fr);
-      gap: 8px;
-      margin-bottom: 20px;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 6px;
+      margin-bottom: 18px;
     }
     .nav button {
-      padding: 10px;
+      padding: 10px 6px;
       border-radius: 10px;
       border: none;
       cursor: pointer;
       font-weight: bold;
       background: #dde7ff;
+      font-size: 14px;
     }
     .nav button.active {
       background: #2d7ff9;
@@ -55,7 +52,7 @@
     }
     .section {
       display: none;
-      animation: fade 0.4s ease-in;
+      animation: fade 0.35s ease-in;
     }
     .section.active {
       display: block;
@@ -114,134 +111,137 @@
 </head>
 <body>
   <div class="container">
-    <h1>Present Simple</h1>
-    <div class="subtitle">Interactive grammar lesson: meaning • form • use</div>
+    <h1>Present Tenses</h1>
+    <div class="subtitle">Present Simple & Present Continuous — interactive lesson</div>
 
     <div class="nav">
-      <button class="active" onclick="show('meaning')">Meaning</button>
-      <button onclick="show('use')">Use</button>
-      <button onclick="show('affirmative')">Affirmative</button>
-      <button onclick="show('negative')">Negative</button>
-      <button onclick="show('questions')">Questions</button>
+      <button class="active" onclick="show('ps-meaning')">PS Meaning</button>
+      <button onclick="show('ps-form')">PS Form</button>
+      <button onclick="show('ps-negative')">PS Negative</button>
+      <button onclick="show('ps-questions')">PS Questions</button>
+      <button onclick="show('pc-meaning')">PC Meaning</button>
+      <button onclick="show('pc-form')">PC Form</button>
+      <button onclick="show('pc-use')">PC Use</button>
       <button onclick="show('compare')">Compare</button>
     </div>
 
-    <!-- MEANING -->
-    <div id="meaning" class="section active">
+    <!-- PRESENT SIMPLE MEANING -->
+    <div id="ps-meaning" class="section active">
       <div class="card rule">
-        <h2>What does the present simple mean?</h2>
-        <p>We use the <span class="highlight">present simple</span> to talk about things that are:</p>
+        <h2>Present Simple: Meaning</h2>
+        <p>We use the <span class="highlight">present simple</span> for:</p>
         <ul>
-          <li>true in general</li>
-          <li>repeated or regular</li>
-          <li>part of everyday life</li>
+          <li>habits and routines</li>
+          <li>facts and general truths</li>
+          <li>things that are always or usually true</li>
         </ul>
       </div>
       <div class="card example">
         <p>Click the verbs:</p>
-        <p>
-          I <span onclick="mark(this)">live</span> in Cairo.<br>
-          We <span onclick="mark(this)">go</span> to school by bus.<br>
-          Water <span onclick="mark(this)">boils</span> at 100°C.
-        </p>
+        <p>I <span onclick="mark(this)">wake</span> up at 6.<br>
+           She <span onclick="mark(this)">works</span> in a bank.<br>
+           Water <span onclick="mark(this)">freezes</span> at 0°C.</p>
       </div>
     </div>
 
-    <!-- USE -->
-    <div id="use" class="section">
+    <!-- PRESENT SIMPLE FORM -->
+    <div id="ps-form" class="section">
       <div class="card rule">
-        <h2>When do we use it?</h2>
-        <ul>
-          <li>Habits and routines</li>
-          <li>Facts and scientific truths</li>
-          <li>Schedules and timetables</li>
-        </ul>
-      </div>
-      <div class="card">
-        <p>Common time expressions:</p>
-        <p class="highlight">always • usually • often • every day • on Mondays</p>
-      </div>
-      <div class="timeline">
-        <div class="timebox">Past</div>
-        <div class="timebox highlight">Always true / repeated</div>
-        <div class="timebox">Future</div>
-      </div>
-    </div>
-
-    <!-- AFFIRMATIVE -->
-    <div id="affirmative" class="section">
-      <div class="card rule">
-        <h2>Affirmative form</h2>
-        <p><span class="highlight">I / you / we / they</span> + base verb</p>
-        <p><span class="highlight">he / she / it</span> + verb + <span class="highlight">-s</span></p>
+        <h2>Present Simple: Affirmative</h2>
+        <p>I / you / we / they + base verb</p>
+        <p>he / she / it + verb + <span class="highlight">-s / -es</span></p>
       </div>
       <div class="card example">
         <p>I play → He <span class="highlight">plays</span></p>
         <p>We go → She <span class="highlight">goes</span></p>
-        <p>They study → It <span class="highlight">studies</span></p>
-      </div>
-      <div class="card activity">
-        <p>Choose the correct verb:</p>
-        <p>My brother ____ TV every evening.</p>
-        <button onclick="fb(this,true)">watches</button>
-        <button onclick="fb(this,false)">watch</button>
-        <div class="feedback"></div>
       </div>
     </div>
 
-    <!-- NEGATIVE -->
-    <div id="negative" class="section">
+    <!-- PRESENT SIMPLE NEGATIVE -->
+    <div id="ps-negative" class="section">
       <div class="card rule">
-        <h2>Negative form</h2>
-        <p>Use <span class="highlight">do not (don't)</span> or <span class="highlight">does not (doesn't)</span></p>
+        <h2>Present Simple: Negative</h2>
+        <p>do not (don't) / does not (doesn't) + base verb</p>
       </div>
       <div class="card example">
-        <p>I <span class="highlight">don't like</span> milk.</p>
+        <p>I <span class="highlight">don't like</span> coffee.</p>
         <p>She <span class="highlight">doesn't eat</span> meat.</p>
-      </div>
-      <div class="card activity">
-        <p>Select the correct sentence:</p>
-        <button onclick="fb(this,true)">He doesn't work on Sunday.</button>
-        <button onclick="fb(this,false)">He doesn't works on Sunday.</button>
-        <div class="feedback"></div>
       </div>
     </div>
 
-    <!-- QUESTIONS -->
-    <div id="questions" class="section">
+    <!-- PRESENT SIMPLE QUESTIONS -->
+    <div id="ps-questions" class="section">
       <div class="card rule">
-        <h2>Question form</h2>
+        <h2>Present Simple: Questions</h2>
         <p><span class="highlight">Do / Does</span> + subject + base verb</p>
       </div>
       <div class="card example">
-        <p><span class="highlight">Do</span> you play chess?</p>
-        <p><span class="highlight">Does</span> she live near here?</p>
-      </div>
-      <div class="card activity">
-        <p>Choose the correct question:</p>
-        <button onclick="fb(this,true)">Does he like coffee?</button>
-        <button onclick="fb(this,false)">Does he likes coffee?</button>
-        <div class="feedback"></div>
+        <p><span class="highlight">Do</span> you live here?</p>
+        <p><span class="highlight">Does</span> she play tennis?</p>
       </div>
     </div>
 
-    <!-- COMPARE -->
+    <!-- PRESENT CONTINUOUS MEANING -->
+    <div id="pc-meaning" class="section">
+      <div class="card rule">
+        <h2>Present Continuous: Meaning</h2>
+        <p>We use the <span class="highlight">present continuous</span> for:</p>
+        <ul>
+          <li>actions happening <span class="highlight">now</span></li>
+          <li>temporary situations</li>
+          <li>things happening around this time</li>
+        </ul>
+      </div>
+      <div class="timeline">
+        <div class="timebox">Past</div>
+        <div class="timebox highlight">NOW</div>
+        <div class="timebox">Future</div>
+      </div>
+    </div>
+
+    <!-- PRESENT CONTINUOUS FORM -->
+    <div id="pc-form" class="section">
+      <div class="card rule">
+        <h2>Present Continuous: Form</h2>
+        <p><span class="highlight">am / is / are</span> + verb + <span class="highlight">-ing</span></p>
+      </div>
+      <div class="card example">
+        <p>I <span class="highlight">am studying</span> English.</p>
+        <p>She <span class="highlight">is watching</span> TV.</p>
+        <p>They <span class="highlight">are playing</span> football.</p>
+      </div>
+    </div>
+
+    <!-- PRESENT CONTINUOUS USE -->
+    <div id="pc-use" class="section">
+      <div class="card rule">
+        <h2>Present Continuous: Use</h2>
+        <p>Common time expressions:</p>
+        <p class="highlight">now • at the moment • right now • today</p>
+      </div>
+      <div class="card example">
+        <p>Listen! The baby <span class="highlight">is crying</span>.</p>
+        <p>I <span class="highlight">am reading</span> a good book this week.</p>
+      </div>
+    </div>
+
+    <!-- COMPARISON -->
     <div id="compare" class="section">
       <div class="card rule">
-        <h2>Present simple vs present continuous</h2>
+        <h2>Present Simple vs Present Continuous</h2>
         <ul>
-          <li><span class="highlight">Present simple</span>: habits, routines</li>
-          <li><span class="highlight">Present continuous</span>: happening now</li>
+          <li>Present simple → habits, facts</li>
+          <li>Present continuous → happening now / temporary</li>
         </ul>
       </div>
       <div class="card example">
-        <p>I <span class="highlight">play</span> football on Saturdays.</p>
-        <p>I <span class="highlight">am playing</span> football now.</p>
+        <p>I <span class="highlight">work</span> in a hospital. (permanent)</p>
+        <p>I <span class="highlight">am working</span> late today. (temporary)</p>
       </div>
       <div class="card activity">
-        <p>Which sentence is correct?</p>
-        <button onclick="fb(this,true)">She works every day.</button>
-        <button onclick="fb(this,false)">She is working every day.</button>
+        <p>Choose the correct sentence:</p>
+        <button onclick="fb(this,true)">She usually walks to school.</button>
+        <button onclick="fb(this,false)">She is usually walking to school.</button>
         <div class="feedback"></div>
       </div>
     </div>
@@ -255,19 +255,17 @@
       document.getElementById(id).classList.add('active');
       event.target.classList.add('active');
     }
-
     function mark(el) {
       el.style.background = '#2d7ff9';
       el.style.color = '#fff';
     }
-
     function fb(btn, correct) {
       const box = btn.parentElement.querySelector('.feedback');
       if (correct) {
         box.textContent = 'Correct.';
         box.style.color = 'green';
       } else {
-        box.textContent = 'Not correct. Check the rule above.';
+        box.textContent = 'Not correct. Think about habit vs now.';
         box.style.color = 'red';
       }
     }
