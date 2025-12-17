@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Mixed Tenses Game</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: linear-gradient(120deg, #eef3ff, #ffffff);
+    margin: 0;
+    padding: 20px;
+  }
+
+  .container {
+    max-width: 850px;
+    margin: auto;
+    background: #fff;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    text-align: center;
+  }
+
+  h1 { margin-bottom: 5px; }
+  .subtitle { color: #555; margin-bottom: 20px; }
+
+  .tense {
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #2d7ff9;
+  }
+
+  .question {
+    font-size: 20px;
+    margin-bottom: 15px;
+  }
+
+  input {
+    padding: 10px;
+    width: 70%;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+  }
+
+  .options button {
+    display: block;
+    width: 70%;
+    margin: 6px auto;
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    background: #f0f3ff;
+    cursor: pointer;
+    font-size: 16px;
+  }
+
+  .options button:hover {
+    background: #dfe7ff;
+  }
+
+  button.main {
+    margin-top: 15px;
+    padding: 10px 20px;
+    border-radius: 12px;
+    border: none;
+    background: #2d7ff9;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+  }
+
+  .feedback {
+    margin-top: 15px;
+    font-weight: bold;
+    font-size: 18px;
+  }
+
+  .green { color: green; }
+  .red { color: red; }
+
+</style>
+</head>
+
+<body>
+<div class="container">
+  <h1>🎯 Mixed Tenses Challenge</h1>
+  <div class="subtitle">Present Simple · Present Continuous · Past Simple · Past Continuous</div>
+
+  <div id="tense" class="tense"></div>
+  <div id="question" class="question"></div>
+
+  <div id="inputArea"></div>
+
+  <button class="main" onclick="checkAnswer()">Check</button>
+  <button class="main" onclick="reveal()">Reveal</button>
+  <button class="main" onclick="nextQuestion()">Next Question</button>
+
+  <div id="feedback" class="feedback"></div>
+</div>
+
+<script>
+const questions = [
+  // PRESENT SIMPLE
+  {t:"Present Simple", q:"She ___ (work) in an office.", a:"works"},
+  {t:"Present Simple", q:"Make negative: He likes coffee.", a:"He does not like coffee"},
+  {t:"Present Simple", q:"Reorder: usually / school / walks / she / to", a:"She usually walks to school"},
+  {t:"Present Simple", q:"Choose: Water ___ at 100°C. (boils / is boiling)", a:"boils", mc:["boils","is boiling"]},
+
+  // PRESENT CONTINUOUS
+  {t:"Present Continuous", q:"They ___ (watch) TV right now.", a:"are watching"},
+  {t:"Present Continuous", q:"Make a question: She is studying.", a:"Is she studying"},
+  {t:"Present Continuous", q:"Reorder: playing / are / children / the / outside", a:"The children are playing outside"},
+  {t:"Present Continuous", q:"Choose: Look! It ___ . (rains / is raining)", a:"is raining", mc:["rains","is raining"]},
+
+  // PAST SIMPLE
+  {t:"Past Simple", q:"I ___ (visit) my grandmother yesterday.", a:"visited"},
+  {t:"Past Simple", q:"Make negative: They went home early.", a:"They did not go home early"},
+  {t:"Past Simple", q:"Reorder: watched / movie / we / night / last / a", a:"We watched a movie last night"},
+  {t:"Past Simple", q:"Choose: He ___ late yesterday. (arrived / was arriving)", a:"arrived", mc:["arrived","was arriving"]},
+
+  // PAST CONTINUOUS
+  {t:"Past Continuous", q:"She ___ (sleep) when I called her.", a:"was sleeping"},
+  {t:"Past Continuous", q:"Make a question: They were playing football.", a:"Were they playing football"},
+  {t:"Past Continuous", q:"Reorder: cooking / was / she / dinner / when / arrived / I", a:"She was cooking dinner when I arrived"},
+  {t:"Past Continuous", q:"Choose: I ___ when it started raining. (walked / was walking)", a:"was walking", mc:["walked","was walking"]},
+
+  // MIXED
+  {t:"Mixed", q:"I usually ___ (drink) tea, but today I ___ (drink) coffee.", a:"drink, am drinking"},
+  {t:"Mixed", q:"They ___ (play) football when it ___ (start) to rain.", a:"were playing, started"},
+  {t:"Mixed", q:"Choose: While I ___ , he called me. (slept / was sleeping)", a:"was sleeping", mc:["slept","was sleeping"]},
+  {t:"Mixed", q:"Reorder: homework / doing / was / she / while / TV / watched / he", a:"She was doing homework while he watched TV"},
+
+  // EXTRA (to reach 30)
+  {t:"Present Simple", q:"Make a question: You like music.", a:"Do you like music"},
+  {t:"Past Simple", q:"Make a question: She finished her work.", a:"Did she finish her work"},
+  {t:"Present Continuous", q:"Make negative: He is listening to music.", a:"He is not listening to music"},
+  {t:"Past Continuous", q:"Make negative: They were running.", a:"They were not running"},
+  {t:"Mixed", q:"I ___ (not / understand) the lesson yesterday.", a:"did not understand"},
+  {t:"Mixed", q:"Look! She ___ (wear) a new dress.", a:"is wearing"},
+  {t:"Mixed", q:"We ___ (have) dinner when the lights ___ (go) out.", a:"were having, went"},
+  {t:"Mixed", q:"Choose: She always ___ early. (arrives / is arriving)", a:"arrives", mc:["arrives","is arriving"]},
+  {t:"Mixed", q:"Choose: At 8 pm last night, I ___ TV. (watched / was watching)", a:"was watching", mc:["watched","was watching"]}
+];
+
+let remaining = [...questions];
+let current = null;
+
+function nextQuestion() {
+  document.getElementById("feedback").textContent = "";
+  if (remaining.length === 0) {
+    alert("All questions completed!");
+    return;
+  }
+  current = remaining.splice(Math.floor(Math.random()*remaining.length),1)[0];
+
+  document.getElementById("tense").textContent = current.t;
+  document.getElementById("question").textContent = current.q;
+
+  const inputArea = document.getElementById("inputArea");
+  inputArea.innerHTML = "";
+
+  if (current.mc) {
+    const div = document.createElement("div");
+    div.className = "options";
+    current.mc.forEach(opt=>{
+      const b = document.createElement("button");
+      b.textContent = opt;
+      b.onclick = ()=>checkMC(opt);
+      div.appendChild(b);
+    });
+    inputArea.appendChild(div);
+  } else {
+    inputArea.innerHTML = '<input id="answer" placeholder="Type your answer here">';
+  }
+}
+
+function checkAnswer() {
+  const user = document.getElementById("answer")?.value.trim().toLowerCase();
+  if (!user) return;
+  showFeedback(user === current.a.toLowerCase());
+}
+
+function checkMC(choice) {
+  showFeedback(choice === current.a);
+}
+
+function showFeedback(correct) {
+  const fb = document.getElementById("feedback");
+  fb.textContent = correct ? "✔ Correct!" : "✖ Try again";
+  fb.className = "feedback " + (correct ? "green" : "red");
+}
+
+function reveal() {
+  const fb = document.getElementById("feedback");
+  fb.textContent = "Answer: " + current.a;
+  fb.className = "feedback";
+}
+
+nextQuestion();
+</script>
+</body>
+</html>
