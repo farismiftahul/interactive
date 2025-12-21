@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Vocabulary Quiz</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(120deg, #1e3c72, #2a5298);
+    color: #fff;
+    margin: 0;
+}
+.container {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px;
+}
+.card {
+    background: #fff;
+    color: #333;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+}
+h1 {
+    text-align: center;
+}
+.word {
+    font-size: 28px;
+    font-weight: bold;
+    text-align: center;
+    color: #1e3c72;
+}
+.question {
+    text-align: center;
+    font-size: 18px;
+    margin: 20px 0;
+}
+.options {
+    display: grid;
+    gap: 15px;
+}
+button.option {
+    padding: 15px;
+    font-size: 16px;
+    border-radius: 12px;
+    border: 2px solid #ddd;
+    cursor: pointer;
+    background: #f9f9f9;
+    text-align: left;
+}
+button.correct {
+    background: #c8e6c9;
+    border-color: #2e7d32;
+    color: #2e7d32;
+}
+button.wrong {
+    background: #ffcdd2;
+    border-color: #c62828;
+    color: #c62828;
+}
+.next {
+    text-align: center;
+    margin-top: 20px;
+}
+.next button {
+    background: #1e3c72;
+    color: #fff;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+.progress {
+    text-align: center;
+    margin-bottom: 15px;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+<h1>Vocabulary Quiz</h1>
+<div class="progress" id="progress"></div>
+
+<div class="card">
+    <div class="word" id="word"></div>
+    <div class="question" id="question"></div>
+    <div class="options" id="options"></div>
+    <div class="next">
+        <button onclick="nextQuestion()">Next</button>
+    </div>
+</div>
+</div>
+
+<script>
+const questions = [
+{w:"horror",q:"What does this word describe?",a:"A movie or story that is meant to scare people",d:[
+"A movie meant to make people laugh",
+"A movie based on real events"
+]},
+{w:"science fiction",q:"What does this genre usually include?",a:"Stories about the future, space, or technology",d:[
+"Stories about historical events",
+"Stories about daily life problems"
+]},
+{w:"romantic movie",q:"What is a romantic movie mainly about?",a:"A story that focuses on love and relationships",d:[
+"A story about solving crimes",
+"A story about fighting wars"
+]},
+{w:"comedy movie",q:"What is the main purpose of a comedy movie?",a:"To make the audience laugh and feel amused",d:[
+"To frighten the audience",
+"To educate the audience"
+]},
+
+{w:"addict",q:"What does the word addict mean?",a:"A person who cannot stop using something harmful",d:[
+"A person who helps sick people",
+"A person who saves money carefully"
+]},
+{w:"addict",q:"Which sentence uses the word addict correctly?",a:"He is an addict who cannot stop playing video games",d:[
+"He is an addict who lends money to people",
+"He is an addict who works in a hospital"
+]},
+
+{w:"banker",q:"What does a banker do?",a:"Works with money in a bank",d:[
+"Treats sick patients",
+"Teaches students at school"
+]},
+{w:"banker",q:"Where does a banker usually work?",a:"In a bank or financial institution",d:[
+"In a restaurant kitchen",
+"In a clothing factory"
+]},
+
+{w:"unusual",q:"Choose the closest meaning:",a:"Not common or not normal",d:[
+"Very popular and common",
+"Easy to understand"
+]},
+{w:"convince",q:"What does convince mean?",a:"To make someone believe or agree",d:[
+"To confuse someone",
+"To ignore someone's opinion"
+]},
+
+{w:"clothes",q:"What does this word refer to?",a:"Things people wear to cover their bodies",d:[
+"Tools used for building houses",
+"Food people eat every day"
+]},
+{w:"clothes",q:"Which place would you go to buy clothes?",a:"A clothing shop or market",d:[
+"A hospital or clinic",
+"A police station"
+]},
+
+{w:"museum",q:"What can you usually see in a museum?",a:"Historical objects or artworks",d:[
+Cars for sale",
+"Doctors treating patients"
+]},
+{w:"airport",q:"What is the main function of an airport?",a:"A place where airplanes arrive and leave",d:[
+A place where ships stop",
+"A place where trains are repaired"
+]},
+{w:"city square",q:"What is a city square usually used for?",a:"Public gatherings and events",d:[
+Growing crops",
+"Parking airplanes"
+]},
+
+{w:"bridge",q:"What is the purpose of a bridge?",a:"To connect two places over water or land",d:[
+To stop cars from moving",
+"To store goods safely"
+]},
+{w:"theme park",q:"Why do people visit a theme park?",a:"For entertainment and rides",d:[
+For medical treatment",
+"To attend business meetings"
+]},
+
+{w:"bandage",q:"What is a bandage used for?",a:"Covering and protecting a wound",d:[
+Measuring body temperature",
+"Listening to the heart"
+]},
+{w:"thermometer",q:"What does a thermometer measure?",a:"Body temperature",d:[
+Blood pressure",
+"Heart sound"
+]},
+{w:"syringe",q:"What is a syringe commonly used for?",a:"Injecting medicine into the body",d:[
+Cutting bandages",
+"Listening to breathing"
+]},
+{w:"pills",q:"What are pills usually taken for?",a:"Treating illness or pain",d:[
+Cleaning wounds",
+"Checking eyesight"
+]},
+{w:"stethoscope",q:"What does a doctor use a stethoscope for?",a:"Listening to the heart or lungs",d:[
+Measuring height",
+"Checking blood type"
+]},
+
+{w:"port",q:"What usually happens at a port?",a:"Ships load and unload goods",d:[
+Airplanes take off",
+"Trains are repaired"
+]},
+{w:"car park",q:"What is a car park used for?",a:"Parking vehicles",d:[
+Selling food",
+"Fixing machines"
+]}
+];
+
+let index = 0;
+let answered = false;
+
+function shuffle(a){return a.sort(()=>Math.random()-0.5);}
+
+function loadQuestion(){
+    answered = false;
+    const q = questions[index];
+    document.getElementById("word").textContent = q.w;
+    document.getElementById("question").textContent = q.q;
+    document.getElementById("progress").textContent =
+        `Question ${index+1} of ${questions.length}`;
+
+    const options = shuffle([q.a, ...q.d]);
+    const box = document.getElementById("options");
+    box.innerHTML = "";
+
+    options.forEach(o=>{
+        const b=document.createElement("button");
+        b.className="option";
+        b.textContent=o;
+        b.onclick=()=>check(b,o===q.a);
+        box.appendChild(b);
+    });
+}
+
+function check(btn,correct){
+    if(answered)return;
+    answered=true;
+    document.querySelectorAll(".option").forEach(b=>{
+        b.disabled=true;
+        if(b.textContent===questions[index].a){
+            b.classList.add("correct");
+        }
+    });
+    if(!correct) btn.classList.add("wrong");
+}
+
+function nextQuestion(){
+    index++;
+    if(index>=questions.length){
+        alert("Quiz completed.");
+        index=0;
+    }
+    loadQuestion();
+}
+
+loadQuestion();
+</script>
+</body>
+</html>
