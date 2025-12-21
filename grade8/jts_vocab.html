@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Vocabulary Quiz</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(120deg, #1e3c72, #2a5298);
+    color: #fff;
+    margin: 0;
+}
+.container {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px;
+}
+.card {
+    background: #fff;
+    color: #333;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+}
+h1 {
+    text-align: center;
+}
+.word {
+    font-size: 30px;
+    font-weight: bold;
+    text-align: center;
+    color: #1e3c72;
+}
+.question {
+    text-align: center;
+    font-size: 18px;
+    margin: 20px 0;
+}
+.options {
+    display: grid;
+    gap: 15px;
+}
+button.option {
+    padding: 15px;
+    font-size: 16px;
+    border-radius: 12px;
+    border: 2px solid #ddd;
+    cursor: pointer;
+    background: #f9f9f9;
+    text-align: left;
+}
+button.correct {
+    background: #c8e6c9;
+    border-color: #2e7d32;
+    color: #2e7d32;
+}
+button.wrong {
+    background: #ffcdd2;
+    border-color: #c62828;
+    color: #c62828;
+}
+.next {
+    text-align: center;
+    margin-top: 20px;
+}
+.next button {
+    background: #1e3c72;
+    color: #fff;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+.progress {
+    text-align: center;
+    margin-bottom: 15px;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+<h1>Vocabulary Quiz</h1>
+<div class="progress" id="progress"></div>
+
+<div class="card">
+    <div class="word" id="word"></div>
+    <div class="question" id="question"></div>
+    <div class="options" id="options"></div>
+    <div class="next">
+        <button onclick="nextQuestion()">Next</button>
+    </div>
+</div>
+</div>
+
+<script>
+const questions = [
+{w:"desert",q:"What does this word mean?",a:"A very dry area with little rainfall",d:[
+"A cold area covered with ice and snow",
+"A forest area with heavy rainfall"
+]},
+{w:"rainforest",q:"What does this word mean?",a:"A forest that receives heavy rainfall all year",d:[
+"A forest that grows in very dry climates",
+"A forest made mainly of pine trees"
+]},
+{w:"grassland",q:"What does this word mean?",a:"A large open area mainly covered with grass",d:[
+"An area covered mostly with sand dunes",
+"An area filled with tall buildings"
+]},
+{w:"valley",q:"What does this word mean?",a:"Low land located between hills or mountains",d:[
+"A flat area at the top of a mountain",
+"A narrow river flowing through land"
+]},
+{w:"coral reef",q:"What does this word mean?",a:"An underwater structure formed by coral organisms",d:[
+"A deep part of the ocean floor",
+"A large rock formation on land"
+]},
+{w:"savannah",q:"What does this word mean?",a:"A grassy plain with scattered trees",d:[
+"A frozen land with permanent ice",
+"A thick forest with tall trees"
+]},
+{w:"pond",q:"What does this word mean?",a:"A small body of still water",d:[
+"A fast-flowing body of water",
+"A very deep body of salt water"
+]},
+{w:"ocean",q:"What does this word mean?",a:"A very large body of salt water",d:[
+"A small freshwater lake",
+"A narrow stream of water"
+]},
+
+{w:"unique",q:"Choose the closest synonym:",a:"Being the only one of its kind",d:[
+"Being very common everywhere",
+"Being similar to many others"
+]},
+{w:"distinctive",q:"Choose the closest synonym:",a:"Easy to recognize as different from others",d:[
+"Hard to notice in a group",
+"Almost the same as others"
+]},
+{w:"conserve",q:"Choose the closest synonym:",a:"To protect and prevent from being wasted",d:[
+"To use without thinking",
+"To completely destroy something"
+]},
+{w:"chase",q:"Choose the closest synonym:",a:"To run after someone or something",d:[
+"To stand still and wait",
+"To move away slowly"
+]},
+{w:"migrate",q:"Choose the closest synonym:",a:"To move from one place to another regularly",d:[
+"To remain in one place permanently",
+"To stop moving completely"
+]},
+
+{w:"accommodation",q:"What does this word mean?",a:"A place where someone can stay or live",d:[
+"A place where people work during the day",
+"A place where food is prepared"
+]},
+{w:"location",q:"What does this word mean?",a:"The exact place where something is found",d:[
+"The reason something happened",
+"The time something occurred"
+]},
+{w:"agriculture",q:"What does this word mean?",a:"The practice of farming and growing crops",d:[
+"The process of building houses",
+"The activity of selling goods"
+]},
+{w:"entertainment",q:"What does this word mean?",a:"Activities meant to amuse or interest people",d:[
+"Activities meant to test knowledge",
+"Activities meant to punish people"
+]},
+{w:"trade",q:"What does this word mean?",a:"The activity of buying and selling goods",d:[
+"The activity of teaching students",
+"The activity of traveling long distances"
+]},
+
+{w:"decrease",q:"Choose the antonym:",a:"To become larger in number or amount",d:[
+"To become smaller slowly",
+"To stay the same size"
+]},
+{w:"expand",q:"Choose the antonym:",a:"To become smaller in size or amount",d:[
+"To grow larger over time",
+"To spread across an area"
+]},
+
+{w:"significant",q:"Choose the closest synonym:",a:"Having an important effect or meaning",d:[
+"Having very little importance",
+"Having no effect at all"
+]},
+{w:"permanent",q:"Choose the antonym:",a:"Lasting for a short period of time",d:[
+"Lasting forever without change",
+"Remaining the same for many years"
+]},
+
+{w:"comedy",q:"What does this word mean?",a:"A type of film or play meant to be funny",d:[
+"A type of film meant to scare people",
+"A type of film based on real events"
+]},
+{w:"horror",q:"What does this word mean?",a:"A type of story meant to frighten people",d:[
+"A type of story meant to educate",
+"A type of story meant to make people laugh"
+]},
+
+{w:"intelligent",q:"Choose the closest synonym:",a:"Able to learn and understand things easily",d:[
+"Unable to think clearly",
+"Slow to understand new ideas"
+]},
+{w:"truthful",q:"Choose the closest synonym:",a:"Always telling the truth",d:[
+"Often telling lies",
+"Avoiding answering questions"
+]},
+
+{w:"carelessly",q:"Choose the antonym:",a:"In a careful and responsible way",d:[
+"In a quick and rushed way",
+"In a relaxed and calm way"
+]},
+{w:"eagerly",q:"Choose the closest synonym:",a:"With excitement and strong interest",d:[
+"With no interest at all",
+"With fear and hesitation"
+]}
+];
+
+let index = 0;
+let answered = false;
+
+function shuffle(a){return a.sort(()=>Math.random()-0.5);}
+
+function loadQuestion(){
+    answered = false;
+    const q = questions[index];
+    document.getElementById("word").textContent = q.w;
+    document.getElementById("question").textContent = q.q;
+    document.getElementById("progress").textContent =
+        `Question ${index+1} of ${questions.length}`;
+
+    const opts = shuffle([q.a, ...q.d]);
+    const box = document.getElementById("options");
+    box.innerHTML = "";
+
+    opts.forEach(o=>{
+        const b=document.createElement("button");
+        b.className="option";
+        b.textContent=o;
+        b.onclick=()=>check(b,o===q.a);
+        box.appendChild(b);
+    });
+}
+
+function check(btn,correct){
+    if(answered)return;
+    answered=true;
+    document.querySelectorAll(".option").forEach(b=>{
+        b.disabled=true;
+        if(b.textContent===questions[index].a) b.classList.add("correct");
+    });
+    if(!correct) btn.classList.add("wrong");
+}
+
+function nextQuestion(){
+    index++;
+    if(index>=questions.length){
+        alert("Quiz completed.");
+        index=0;
+    }
+    loadQuestion();
+}
+
+loadQuestion();
+</script>
+</body>
+</html>
