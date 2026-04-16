@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Vocabulary Grid</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    margin-top: 50px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 120px);
+    gap: 10px;
+  }
+
+  .cell {
+    background-color: #4CAF50;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 120px;
+    cursor: pointer;
+    font-size: 14px;
+    text-align: center;
+    border-radius: 10px;
+    transition: 0.3s;
+  }
+
+  .cell.revealed {
+    background-color: #2196F3;
+  }
+</style>
+</head>
+<body>
+
+<div class="grid">
+  <div class="cell" onclick="reveal(this, 'interrupt')">1</div>
+  <div class="cell" onclick="reveal(this, 'encourage')">2</div>
+  <div class="cell" onclick="reveal(this, 'tell someone off')">3</div>
+  <div class="cell" onclick="reveal(this, 'get into trouble')">4</div>
+  <div class="cell" onclick="reveal(this, 'compare')">5</div>
+  <div class="cell" onclick="reveal(this, 'concentrate')">6</div>
+  <div class="cell" onclick="reveal(this, 'share')">7</div>
+  <div class="cell" onclick="reveal(this, 'are supposed to')">8</div>
+  <div class="cell" onclick="reveal(this, 'distract')">9</div>
+</div>
+
+<script>
+function reveal(element, text) {
+  element.innerText = text;
+  element.classList.add("revealed");
+}
+</script>
+
+</body>
+</html>
